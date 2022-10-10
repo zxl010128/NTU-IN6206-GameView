@@ -1,6 +1,13 @@
 package DAO;
 
 import java.sql.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.sql.DriverManager;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import entity.Game;
 
 public class GameDBAO {
 	Connection con;
@@ -60,4 +67,48 @@ public class GameDBAO {
         conFree = true;
         notify();
     } 
+    
+    public Game getByCategory(String category) {
+    	Game games = new Game();  
+		try {
+			 String selectStatement = "select game_id from game_table where category= ?";
+			 getConnection();  	
+			 PreparedStatement prepStmt = con.prepareStatement(selectStatement);
+		     prepStmt.setString(1, category);
+		     ResultSet rs = prepStmt.executeQuery();
+		     while(rs.next()) {
+		    	 Game gm = new Game(rs.getLong("game_id"),rs.getString("gamename"),rs.getString("gamepicture"),rs.getString("category"),rs.getString("introduction"),rs.getInt("totalscore"),rs.getInt("number_of_users_rated"));
+		    	   games = gm;
+		     }
+		     prepStmt.close();
+		     
+		} catch (SQLException ex) {
+	         releaseConnection();
+	         ex.printStackTrace();
+	    }		        
+	    releaseConnection();
+        return games;
+    }
+    
+    public List<Game> getAll() {
+    	List<Game> games = new ArrayList<Game>();
+    	try {
+    		String selectStatement = "select * from game_table";
+    		getConnection();
+    		PreparedStatement prepStmt = con.prepareStatement(selectStatement);
+    		ResultSet rs = prepStmt.executeQuery();	
+    		
+    		while(rs.next()) {
+    			Game gm = new Game(rs.getLong("game_id"), rs.getString("gamename"), rs.getString("gamepicture"), rs.getString("category"), rs.getInt("totalscore"));
+    			games.add(gm);
+    		}
+    		prepStmt.close();
+    	}catch(SQLException ex) {
+    		releaseConnection();
+            ex.printStackTrace();
+    	}
+    	releaseConnection();
+    	return games;
+    }
 }
+    	

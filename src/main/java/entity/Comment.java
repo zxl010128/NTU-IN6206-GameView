@@ -38,6 +38,15 @@ public class Comment {
 		this.gameId = gameId;
 	}
 	
+	public Comment(Long id, int totalLike, int totalDislike, int totalLove, String content, Date createTime) {
+		this.id = id;
+		this.totalLike = totalLike;
+		this.totalDislike = totalDislike;
+		this.totalLove = totalLove;
+		this.content = content;
+		this.createTime = createTime;
+	}
+	
 	public Comment() {
 		
 	}

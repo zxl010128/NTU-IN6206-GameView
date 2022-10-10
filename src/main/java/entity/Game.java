@@ -16,14 +16,6 @@ public class Game {
 	
 	private int rateNum; // number of users rated
 	
-	public Game(Long id, String gameName, String gamePicture, String category, int score ) {
-		this.id = id;
-		this.gameName = gameName;
-		this.gamePicture = gamePicture;
-		this.category = category;
-		this.score = score;
-	}
-	
 	public Game(Long id, String gameName, String gamePicture, String category, String introduction, int score, int rateNum) {
 		this.id = id;
 		this.gameName = gameName;
@@ -32,6 +24,14 @@ public class Game {
 		this.introduction = introduction;
 		this.score = score;
 		this.rateNum = rateNum;
+	}
+	
+	public Game(Long id, String gameName, String gamePicture, String category, int score) {
+		this.id = id;
+		this.gameName = gameName;
+		this.gamePicture = gamePicture;
+		this.category = category;
+		this.score = score;
 	}
 	
 	public Game(){

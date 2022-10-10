@@ -1,7 +1,11 @@
 package DAO;
 
 import java.sql.*;
+import java.util.ArrayList;
+import java.util.List;
 
+import entity.Comment;
+import entity.Reply;
 public class ReplyDBAO {
 	
 	Connection con;
@@ -60,4 +64,25 @@ public class ReplyDBAO {
         conFree = true;
         notify();
     } 
+    
+    public List<Reply> getAll(){
+    	List<Reply> replys = new ArrayList<Reply>();
+    	try {
+    		String selectStatement = "select * from reply_table";
+    		getConnection();
+    		PreparedStatement prepStmt = con.prepareStatement(selectStatement);
+    		ResultSet rs = prepStmt.executeQuery();	
+    		
+    		while(rs.next()) {
+    			Reply rpl = new Reply(rs.getLong("reply_id"), rs.getDate("createtime"), rs.getString("content"), rs.getLong("reply_to_id"), rs.getLong("post_id"));
+    			replys.add(rpl);
+    		}
+    		prepStmt.close();
+    	} catch(SQLException ex) {
+    		releaseConnection();
+            ex.printStackTrace();
+    	}
+    	releaseConnection();
+    	return replys;
+    }
 }
