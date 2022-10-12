@@ -82,4 +82,45 @@ public class ScoreDBAO {
 	    releaseConnection();
 	    return avgScore;
     }
+    
+    public boolean insertReason(Long userId, Long gameId, int score, String reasons) {
+    	boolean status = false;
+    	try {
+    		String selectStatement = "insert into scoring_table(scoring_id, game_id, user_id, score, reasons_for_scoring, createtime) values (?,?,?,?,?,?);";
+    		getConnection();
+    		PreparedStatement prepStmt = con.prepareStatement(selectStatement);
+    		
+    		Long maxID = (long) 0;
+			String selectMaxid = "select MAX(scoring_id) as maxid from scoring_table";
+			Statement statement = con.createStatement();
+			ResultSet rs = statement.executeQuery(selectMaxid);
+			if (rs.next()) {
+				maxID = rs.getLong("maxid");
+				// System.out.println(maxID);
+			}
+			statement.close();
+
+			Long scoring_id = maxID + 1;
+			
+			prepStmt.setLong(1, scoring_id);
+    		prepStmt.setLong(2, gameId);
+    		prepStmt.setLong(3, userId);
+    		prepStmt.setInt(4, score);
+    		prepStmt.setString(5, reasons);
+    		prepStmt.setDate(6, new Date(new java.util.Date().getTime()));
+    		
+    		int x = prepStmt.executeUpdate();
+            if (x == 1) {
+            	status = true;       
+            } 
+            
+            prepStmt.close();
+            releaseConnection();
+            
+    	} catch(SQLException ex) {
+    		releaseConnection();
+    		ex.printStackTrace();
+    	}
+    	return status;
+    }
 }

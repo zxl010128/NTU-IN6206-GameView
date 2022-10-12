@@ -7,6 +7,8 @@ import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+
+import entity.Comment;
 import entity.Game;
 
 public class GameDBAO {
@@ -68,17 +70,17 @@ public class GameDBAO {
         notify();
     } 
     
-    public Game getByCategory(String category) {
-    	Game games = new Game();  
+    public List<Game> findByCategory(String category) {
+    	List<Game> games = new ArrayList<Game>();  
 		try {
-			 String selectStatement = "select game_id from game_table where category= ?";
+			 String selectStatement = "select game_id, gamename, gamepicture, category, introduction, totalscore, number_of_user_rated " + "from game_table where category = ?"; 
 			 getConnection();  	
 			 PreparedStatement prepStmt = con.prepareStatement(selectStatement);
 		     prepStmt.setString(1, category);
 		     ResultSet rs = prepStmt.executeQuery();
 		     while(rs.next()) {
 		    	 Game gm = new Game(rs.getLong("game_id"),rs.getString("gamename"),rs.getString("gamepicture"),rs.getString("category"),rs.getString("introduction"),rs.getInt("totalscore"),rs.getInt("number_of_users_rated"));
-		    	   games = gm;
+		    	   games.add(gm);
 		     }
 		     prepStmt.close();
 		     
@@ -88,6 +90,28 @@ public class GameDBAO {
 	    }		        
 	    releaseConnection();
         return games;
+    }
+    
+    public Game findById(Long id) {
+    	Game game = new Game();  
+		try {
+			 String selectStatement = "select game_id, gamename, gamepicture, category, introduction, totalscore, number_of_user_rated " + "from game_table where game_id = ?"; 
+			 getConnection();  	
+			 PreparedStatement prepStmt = con.prepareStatement(selectStatement);
+		     prepStmt.setLong(1, id);
+		     ResultSet rs = prepStmt.executeQuery();
+		     while(rs.next()) {
+		    	 Game gm = new Game(rs.getLong("game_id"),rs.getString("gamename"),rs.getString("gamepicture"),rs.getString("category"),rs.getString("introduction"),rs.getInt("totalscore"),rs.getInt("number_of_users_rated"));
+		    	   game = gm;
+		     }
+		     prepStmt.close();
+		     
+		} catch (SQLException ex) {
+	         releaseConnection();
+	         ex.printStackTrace();
+	    }		        
+	    releaseConnection();
+        return game;
     }
     
     public List<Game> getAll() {

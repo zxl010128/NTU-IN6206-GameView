@@ -2,6 +2,7 @@ package DAO;
 
 import javax.mail.Authenticator;
 
+
 //import java.util.random.*;
 import java.security.SecureRandom;
 import java.sql.Connection;
@@ -226,28 +227,32 @@ public class UserDBAO {
 		return status;
 	}
 
-	/*
-	 * public User findByUserid(Long user_id) { User ruser= new User(); try { String
-	 * selectStatement =
-	 * "select user_id,username,password,facepicture,phonenumber,email,dob,gender,coin,following_list,fans_list,bookmark_list,token,reset_code "
-	 * + "from profile_table where user_id = ?"; getConnection(); PreparedStatement
-	 * prepStmt = con.prepareStatement(selectStatement); prepStmt.setLong(1,
-	 * user_id); ResultSet rs = prepStmt.executeQuery(); if (rs.next()) { User user
-	 * = new User(rs.getLong("user_id"), rs.getString("username"),
-	 * rs.getString("password"), rs.getString("facepicture"),
-	 * rs.getString("phonenumber"), rs.getString("email"),rs.getString("dob"),
-	 * rs.getInt("gender"), rs.getInt("coin"), rs.getString("following_list"),
-	 * rs.getString("fans_list"),rs.getString("bookmark_list"),
-	 * rs.getString("token"),rs.getString("reset_code") ); ruser = user;
-	 * prepStmt.close(); releaseConnection();
-	 * 
-	 * } else { prepStmt.close(); releaseConnection(); ruser = null;
-	 * 
-	 * }
-	 * 
-	 * } catch (SQLException ex) { releaseConnection(); ex.printStackTrace(); }
-	 * return ruser; }
-	 */
+	
+	 public User findByUserid(Long user_id) { 
+		 User ruser= new User(); 
+		 try { 
+			 String selectStatement = "select user_id,username,facepicture,phonenumber,email,dob,gender " + "from profile_table where user_id = ?"; 
+			 getConnection(); 
+			 PreparedStatement prepStmt = con.prepareStatement(selectStatement); 
+			 prepStmt.setLong(1,user_id); 
+			 ResultSet rs = prepStmt.executeQuery(); 
+			 if (rs.next()) { 
+				 User user = new User(rs.getLong("user_id"), rs.getString("username"), rs.getString("facepicture"), rs.getString("phonenumber"), rs.getString("email"),rs.getString("dob"), rs.getInt("gender")); 
+				 ruser = user;
+				 prepStmt.close(); 
+				 releaseConnection();
+			 } else { 
+				 prepStmt.close(); 
+				 releaseConnection(); 
+				 ruser = null;
+			 }
+	 } catch (SQLException ex) { 
+		 releaseConnection(); 
+		 ex.printStackTrace(); 
+	}
+	  return ruser; 
+}
+
 
 	public Long findByEmail(String email) {
 		Long id = null;
@@ -466,6 +471,7 @@ public class UserDBAO {
 			releaseConnection();
 			ex.printStackTrace();
 		}
+		
 		return status;
 	}
 
@@ -505,19 +511,16 @@ public class UserDBAO {
 		return result;
 	}
 
-	public boolean verifyToken(Long id, String token) {
-		boolean valid = false;
+	public Long identifyId(String token) {
+		Long id = (long)0;
 		try {
-			String select = "select token from profile_table where user_id = ?";
+			String select = "select user_id from profile_table where token = ?";
 			getConnection();
 			PreparedStatement prepStmt = con.prepareStatement(select);
-			prepStmt.setLong(1, id);
+			prepStmt.setString(1, token);
 			ResultSet rs = prepStmt.executeQuery();
 			if (rs.next()) {
-				String rtoken = rs.getString("token");
-				if (rtoken.equals(token)) {
-					valid = true;
-				}
+				id = rs.getLong("user_id");
 			}
 			prepStmt.close();
 			releaseConnection();
@@ -525,7 +528,7 @@ public class UserDBAO {
 			releaseConnection();
 			ex.printStackTrace();
 		}
-		return valid;
+		return id;
 	}
 
 	public boolean newFollowing(Long followerid, Long followedid) {

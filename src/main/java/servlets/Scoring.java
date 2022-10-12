@@ -11,20 +11,21 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import DAO.ScoreDBAO;
 import DAO.UserDBAO;
 import net.sf.json.JSONObject;
 
 /**
- * Servlet implementation class ChangeProfile
+ * Servlet implementation class Scoring
  */
-@WebServlet("/ChangeProfile")
-public class ChangeProfile extends HttpServlet {
+@WebServlet("/Scoring")
+public class Scoring extends HttpServlet {
 	private static final long serialVersionUID = 1L;
        
     /**
      * @see HttpServlet#HttpServlet()
      */
-    public ChangeProfile() {
+    public Scoring() {
         super();
         // TODO Auto-generated constructor stub
     }
@@ -34,17 +35,11 @@ public class ChangeProfile extends HttpServlet {
 	 */
 	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 		// TODO Auto-generated method stub
-		
-//		Long id = Long.parseLong(request.getParameter("user_id")); 
-		String username = request.getParameter("username"); 
-		String email = request.getParameter("email"); 
-		String phonenumber = request.getParameter("phonenumber"); 
-		String facepicture = request.getParameter("facepicture"); 
-		String password = request.getParameter("password"); 
-		String dob = request.getParameter("dob"); 
-		int gender = Integer.parseInt(request.getParameter("gender")); 
-
-		try { 
+		Long game_id = Long.parseLong(request.getParameter("game_id"));
+		int score = Integer.parseInt(request.getParameter("score"));
+		String content = request.getParameter("reasons_for_scoring");
+		try {
+			PrintWriter out = response.getWriter();
 			UserDBAO userdbao = new UserDBAO();
 			Cookie[] cookie = request.getCookies();
 			Long id = (long)0;
@@ -54,31 +49,32 @@ public class ChangeProfile extends HttpServlet {
 					if(id == 0) {
 						JSONObject jsonObject=new JSONObject(); 
 						jsonObject.put("message", "Please login ");
-						PrintWriter out = response.getWriter(); 
 						out.write(jsonObject.toString()); 
 						out.flush();    
 						return; 
 					}
 				}
 			}
-			PrintWriter out = response.getWriter(); 
-			boolean x = userdbao.changeProfile(username, facepicture, password, email, phonenumber, gender, dob, id);
-			if (x == false) { 
+			ScoreDBAO scoredbao = new ScoreDBAO();
+			boolean x = scoredbao.insertReason(id, game_id, score, content);
+			if(x == false) {
 				JSONObject jsonObject=new JSONObject() ; 
-				jsonObject.put("message", "Modification failed! "); 
+				jsonObject.put("message", "Score failed! "); 
 				out.write(jsonObject.toString()); 
 				out.flush(); 
 				return; 
-			} 
-				JSONObject jsonObject=new JSONObject(); 
-				jsonObject.put("message", "Modification Succeeded! "); 
-				out.write(jsonObject.toString()); 
-				out.flush();    
-				return;  
-		} catch (Exception e) { 
-			// TODO Auto-generated catch block 
-			e.printStackTrace(); 
 			}
+			JSONObject jsonObject=new JSONObject() ; 
+			jsonObject.put("message", "Score successfully! "); 
+			out.write(jsonObject.toString()); 
+			out.flush(); 
+			return; 
+			
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		
 		
 		}
 

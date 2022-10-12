@@ -2,6 +2,7 @@ package DAO;
 
 import java.sql.*;
 
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -120,13 +121,27 @@ public class CommentDBAO {
     public boolean insertComment(Long userId, Long gameId, String content) {
     	boolean status = false;
     	try {
-    		String selectStatement = "insert into comment_table(game_id, user_id, content, createtime) values (?,?,?,?);";
+    		String selectStatement = "insert into comment_table(post_id, game_id, user_id, totallike, totaldislike, totallove, content, createtime, is_get_coin) values (?,?,?,0,0,0,?,?,0);";
     		getConnection();
     		PreparedStatement prepStmt = con.prepareStatement(selectStatement);
-    		prepStmt.setLong(1, gameId);
-    		prepStmt.setLong(2, userId);
-    		prepStmt.setString(3, content);
-    		prepStmt.setDate(4, new Date(new java.util.Date().getTime()));
+    		
+    		Long maxID = (long) 0;
+			String selectMaxid = "select MAX(post_id) as maxid from comment_table";
+			Statement statement = con.createStatement();
+			ResultSet rs = statement.executeQuery(selectMaxid);
+			if (rs.next()) {
+				maxID = rs.getLong("maxid");
+				// System.out.println(maxID);
+			}
+			statement.close();
+
+			Long post_id = maxID + 1;
+			
+			prepStmt.setLong(1, post_id);
+    		prepStmt.setLong(2, gameId);
+    		prepStmt.setLong(3, userId);
+    		prepStmt.setString(4, content);
+    		prepStmt.setDate(5, new Date(new java.util.Date().getTime()));
     		
     		int x = prepStmt.executeUpdate();
             if (x == 1) {
