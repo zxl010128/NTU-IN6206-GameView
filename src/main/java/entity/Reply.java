@@ -12,17 +12,20 @@ public class Reply {
 	
 	private Long userId;
 	
+	private Long CommentId;
+	
 	private Long replyToId;
 	
 	private User user;
 	
 	private Comment comment;
 	
-	public Reply(Long id, Date createTime, String content, Long userId, Long replyToId) {
+	public Reply(Long id, Date createTime, String content, Long userId, Long CommentId, Long replyToId) {
 		this.id = id;
 		this.createTime = createTime;
 		this.content = content;
 		this.userId = userId;
+		this.CommentId = CommentId;
 		this.replyToId = replyToId;
 	}
 	

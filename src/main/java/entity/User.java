@@ -127,20 +127,4 @@ public class User {
 		this.reset_code = reset_code;
 	}
 	
-	public User() {
-		
-	}
-	
-	public User(Long id, String userName, String facepic, String password, 
-			String email, String phone, Integer gender, String dob) {
-		this.id = id;
-	 	this.userName= userName;
-	 	this.password = password;
-	 	this.facepic = facepic;	
-	 	this.email = email;
-	 	this.phone = phone;
-	 	this.gender = gender;
-	 	this.dob = dob;
-	}
-	
 }

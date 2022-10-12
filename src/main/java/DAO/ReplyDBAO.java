@@ -74,7 +74,7 @@ public class ReplyDBAO {
     		ResultSet rs = prepStmt.executeQuery();	
     		
     		while(rs.next()) {
-    			Reply rpl = new Reply(rs.getLong("reply_id"), rs.getDate("createtime"), rs.getString("content"), rs.getLong("reply_to_id"), rs.getLong("post_id"));
+    			Reply rpl = new Reply(rs.getLong("reply_id"), rs.getDate("createtime"), rs.getString("content"), rs.getLong("user_id"), rs.getLong("post_id"), rs.getLong("reply_to_id"));
     			replys.add(rpl);
     		}
     		prepStmt.close();
@@ -84,5 +84,33 @@ public class ReplyDBAO {
     	}
     	releaseConnection();
     	return replys;
+    }
+    
+    public boolean insertReply(Long userId, Long commentId, String content, Long replyToId) {
+    	boolean status = false;
+    	try {
+    		String selectStatement = "insert into reply_table(post_id, user_id, content, createtime, reply_to_id) values (?,?,?,?,?);";
+    		getConnection();
+    		PreparedStatement prepStmt = con.prepareStatement(selectStatement);
+    		prepStmt.setLong(1, commentId);
+    		prepStmt.setLong(2, userId);
+    		prepStmt.setString(3, content);
+    		prepStmt.setDate(4, new Date(new java.util.Date().getTime()));
+    		prepStmt.setLong(5, replyToId);
+    		
+    		int x = prepStmt.executeUpdate();
+            if (x == 1) {
+            	status = true;       
+            } 
+            
+            prepStmt.close();
+            releaseConnection();
+            
+    	} catch(SQLException ex) {
+    		releaseConnection();
+    		ex.printStackTrace();
+    	}
+    	return status;
+    	
     }
 }

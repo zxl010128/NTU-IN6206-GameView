@@ -2,6 +2,8 @@ package DAO;
 
 import java.sql.*;
 
+import entity.Game;
+
 public class ScoreDBAO {
 	
 	Connection con;
@@ -60,5 +62,24 @@ public class ScoreDBAO {
         conFree = true;
         notify();
     } 
-
+    
+    public int getScore() {
+    	int avgScore = 0;
+    	try {
+			 String selectStatement = "select AVG(score) as averageScore from score_table";
+			 getConnection();  	
+			 PreparedStatement prepStmt = con.prepareStatement(selectStatement);
+		     ResultSet rs = prepStmt.executeQuery();
+		     while(rs.next()) {
+		    	 avgScore = rs.getInt("averageScore");
+		     }
+		     prepStmt.close();
+		     
+		} catch (SQLException ex) {
+	         releaseConnection();
+	         ex.printStackTrace();
+	    }		        
+	    releaseConnection();
+	    return avgScore;
+    }
 }
