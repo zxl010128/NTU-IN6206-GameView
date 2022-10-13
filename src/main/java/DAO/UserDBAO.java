@@ -3,6 +3,7 @@ package DAO;
 import javax.mail.Authenticator;
 
 
+
 //import java.util.random.*;
 import java.security.SecureRandom;
 import java.sql.Connection;
@@ -24,7 +25,8 @@ import javax.mail.internet.InternetAddress;
 import javax.mail.internet.MimeMessage;
 
 import javax.mail.Message;
-
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
 import entity.User;
 
 public class UserDBAO {
@@ -115,6 +117,30 @@ public class UserDBAO {
 		}
 		return status;
 	}
+	
+	public String getMD5(String password) {
+		 try {
+	            MessageDigest md = MessageDigest.getInstance("SHA");//创建具有指定算法名称的摘要
+	            md.update(password.getBytes());                    //使用指定的字节数组更新摘要
+	            byte mdBytes[] = md.digest();                 //进行哈希计算并返回一个字节数组
+
+	            String hash = "";
+	            for(int i= 0;i<mdBytes.length;i++){           //循环字节数组
+	                int temp;
+	                if(mdBytes[i]<0)                          //如果有小于0的字节,则转换为正数
+	                    temp =256+mdBytes[i];
+	                else
+	                    temp=mdBytes[i];
+	                if(temp<16)
+	                    hash+= "0";
+	                hash+=Integer.toString(temp,16);         //将字节转换为16进制后，转换为字符串
+	            }
+	            return hash;
+	        } catch (NoSuchAlgorithmException e) {
+	            e.printStackTrace();
+	        }
+	        return null;
+	    }
 
 	public boolean register(String username, String password, String facepicture, String phonenumber, String email,
 			String dob, int gender) {
@@ -136,7 +162,8 @@ public class UserDBAO {
 			statement.close();
 
 			Long user_id = maxID + 1;
-
+					
+			password = getMD5(password);
 			prepStmt.setLong(1, user_id);
 			prepStmt.setString(2, username);
 			prepStmt.setString(3, password);
@@ -307,6 +334,7 @@ public class UserDBAO {
 			PreparedStatement prepStmt = con.prepareStatement(selectStatement);
 			prepStmt.setString(1, email);
 			ResultSet rs = prepStmt.executeQuery();
+			password = getMD5(password);
 			if (rs.next()) {
 				String pswd = rs.getString("password");
 				if (pswd.equals(password)) {
@@ -335,6 +363,7 @@ public class UserDBAO {
 			PreparedStatement prepStmt = con.prepareStatement(selectStatement);
 			prepStmt.setString(1, username);
 			ResultSet rs = prepStmt.executeQuery();
+			password = getMD5(password);
 			if (rs.next()) {
 				String pswd = rs.getString("password");
 				// System.out.println(pswd);
@@ -459,6 +488,7 @@ public class UserDBAO {
 		try {
 			String update = "update profile_table " + "set password=? " + "where email=? ";
 			PreparedStatement prepStmt = con.prepareStatement(update);
+			newPwd = getMD5(newPwd);
 			prepStmt.setString(1, newPwd);
 			prepStmt.setString(2, email);
 			int x = prepStmt.executeUpdate();
@@ -665,10 +695,11 @@ public class UserDBAO {
 			if (rs.next()) {
 				bookmarklist = rs.getString("Bookmark_list");
 
-				if (bookmarklist == "") {
-					bookmarklist = String.valueOf(id);
+				if (bookmarklist == "[]") {
+					bookmarklist = "["+String.valueOf(id)+"]";
 				} else {
-					bookmarklist = bookmarklist + "," + String.valueOf(id);
+					bookmarklist.replace("]",",");
+					bookmarklist = bookmarklist + "," + String.valueOf(id)+ "]";
 				}
 
 				prepStmt1.close();
@@ -706,6 +737,11 @@ public class UserDBAO {
 			String bookmarklist = "";
 			if (rs.next()) {
 				bookmarklist = rs.getString("bookmarklist");
+				if(bookmarklist.indexOf(",")==-1) {
+					bookmarklist = "[]";
+				}else {
+					bookmarklist.replace(","+id, "");
+				}
 				prepStmt1.close();
 			} else {
 				prepStmt1.close();

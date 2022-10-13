@@ -63,58 +63,116 @@ public class ScoreDBAO {
         notify();
     } 
     
-    public int getScore() {
+    public boolean updateScore(Long gameId) {
+    	boolean status = false;
     	int avgScore = 0;
+    	int totalusers = 0;
     	try {
-			 String selectStatement = "select AVG(score) as averageScore from score_table";
+			 String selectStatement = "select AVG(score) as averageScore,COUNT(scoring_id) as totalUsers from scoring_table where game_id=?";
 			 getConnection();  	
 			 PreparedStatement prepStmt = con.prepareStatement(selectStatement);
+			 prepStmt.setLong(1, gameId);  
 		     ResultSet rs = prepStmt.executeQuery();
-		     while(rs.next()) {
+		     if (rs.next()) {
 		    	 avgScore = rs.getInt("averageScore");
+		    	 totalusers = rs.getInt("totalUsers");
 		     }
 		     prepStmt.close();
+		     releaseConnection();
+//		     System.out.println(avgScore);
+//		     System.out.println(totalusers);
+		     
+		     String Statement = "update game_table " + "set totalscore=?,number_of_users_rated=? " + "where game_id=? ";
+		     getConnection();
+		     PreparedStatement prepStmt0 = con.prepareStatement(Statement);
+			 prepStmt0.setInt(1, avgScore);
+			 prepStmt0.setInt(2, totalusers);
+			 prepStmt0.setLong(3, gameId);
+			 int x = prepStmt0.executeUpdate();
+			 if (x == 1) {
+		    	 status = true;
+		     }
+			 prepStmt0.close();
 		     
 		} catch (SQLException ex) {
 	         releaseConnection();
 	         ex.printStackTrace();
 	    }		        
 	    releaseConnection();
-	    return avgScore;
+	    return status;
+    }
+    
+    public boolean checkUserId(Long userId) {
+    	boolean status = false;
+    	try {
+    		String selectStatement = "select scoring_id from scoring_table where user_id=?";
+    		getConnection();
+    		PreparedStatement prepStmt = con.prepareStatement(selectStatement);
+			
+			prepStmt.setLong(1, userId);  
+			ResultSet rs = prepStmt.executeQuery();
+            if (rs.next()) {
+            	status = true;       
+            } 
+            prepStmt.close();
+            releaseConnection();
+            
+    	} catch(SQLException ex) {
+    		releaseConnection();
+    		ex.printStackTrace();
+    	}
+    	//System.out.println(status);
+    	return status;
     }
     
     public boolean insertReason(Long userId, Long gameId, int score, String reasons) {
     	boolean status = false;
     	try {
-    		String selectStatement = "insert into scoring_table(scoring_id, game_id, user_id, score, reasons_for_scoring, createtime) values (?,?,?,?,?,?);";
-    		getConnection();
-    		PreparedStatement prepStmt = con.prepareStatement(selectStatement);
-    		
-    		Long maxID = (long) 0;
-			String selectMaxid = "select MAX(scoring_id) as maxid from scoring_table";
-			Statement statement = con.createStatement();
-			ResultSet rs = statement.executeQuery(selectMaxid);
-			if (rs.next()) {
-				maxID = rs.getLong("maxid");
-				// System.out.println(maxID);
-			}
-			statement.close();
+    		if(checkUserId(userId)==false) {
+    			String selectStatement = "insert into scoring_table(scoring_id, game_id, user_id, score, reasons_for_scoring, createtime) values (?,?,?,?,?,?);";
+        		getConnection();
+        		PreparedStatement prepStmt = con.prepareStatement(selectStatement);
+        		
+        		Long maxID = (long) 0;
+    			String selectMaxid = "select MAX(scoring_id) as maxid from scoring_table";
+    			Statement statement = con.createStatement();
+    			ResultSet rs = statement.executeQuery(selectMaxid);
+    			if (rs.next()) {
+    				maxID = rs.getLong("maxid");
+    				// System.out.println(maxID);
+    			}
+    			statement.close();
 
-			Long scoring_id = maxID + 1;
-			
-			prepStmt.setLong(1, scoring_id);
-    		prepStmt.setLong(2, gameId);
-    		prepStmt.setLong(3, userId);
-    		prepStmt.setInt(4, score);
-    		prepStmt.setString(5, reasons);
-    		prepStmt.setDate(6, new Date(new java.util.Date().getTime()));
+    			Long scoring_id = maxID + 1;
+    			
+    			prepStmt.setLong(1, scoring_id);
+        		prepStmt.setLong(2, gameId);
+        		prepStmt.setLong(3, userId);
+        		prepStmt.setInt(4, score);
+        		prepStmt.setString(5, reasons);
+        		prepStmt.setDate(6, new Date(new java.util.Date().getTime()));
+        		
+        		int x = prepStmt.executeUpdate();
+                if (x == 1) {
+                	status = true;       
+                } 
+                prepStmt.close();
+    		}else {
+    			String selectStatement = "update scoring_table " + "set score=?,reasons_for_scoring=?,createtime=? " + "where user_id=? ";
+    			getConnection();
+    			PreparedStatement prepStmt = con.prepareStatement(selectStatement);
     		
-    		int x = prepStmt.executeUpdate();
-            if (x == 1) {
-            	status = true;       
-            } 
-            
-            prepStmt.close();
+    			prepStmt.setInt(1, score);
+    			prepStmt.setString(2, reasons);
+    			prepStmt.setDate(3, new Date(new java.util.Date().getTime()));
+    			prepStmt.setLong(4, userId);
+    		
+    			int x = prepStmt.executeUpdate();
+    			if (x == 1) {
+    				status = true;       
+    			} 
+    			prepStmt.close();
+    		}
             releaseConnection();
             
     	} catch(SQLException ex) {

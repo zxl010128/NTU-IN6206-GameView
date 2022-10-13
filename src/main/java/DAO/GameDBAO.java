@@ -114,6 +114,27 @@ public class GameDBAO {
         return game;
     }
     
+    public List<Game> rankByScore(String category){
+    	List<Game> games = new ArrayList<Game>();
+    	try {
+    		String selectStatement = "select gamename,totalscore from game_table where category=? order by totalscore limit 10";
+    		getConnection();
+    		PreparedStatement prepStmt = con.prepareStatement(selectStatement);
+    		ResultSet rs = prepStmt.executeQuery();	
+   
+    		while(rs.next()) {
+    			Game gm = new Game(rs.getString("gamename"), rs.getInt("totalscore"));
+    			games.add(gm);
+    		}
+    		prepStmt.close();
+    	}catch(SQLException ex) {
+    		releaseConnection();
+            ex.printStackTrace();
+    	}
+    	releaseConnection();
+    	return games;
+    }
+    
     public List<Game> getAll() {
     	List<Game> games = new ArrayList<Game>();
     	try {

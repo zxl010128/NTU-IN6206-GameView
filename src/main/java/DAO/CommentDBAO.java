@@ -158,6 +158,134 @@ public class CommentDBAO {
     	return status;
     }
     
+    public boolean addLike(Long commentId) {
+    	boolean status = false;
+    	try {
+    		String select = "select totallike from comment_table where post_id = ?";
+			getConnection();
+			PreparedStatement prepStmt = con.prepareStatement(select);
+			prepStmt.setLong(1, commentId);
+			ResultSet rs = prepStmt.executeQuery();
+			int totalLike = 0;
+			if (rs.next()) {
+				totalLike = rs.getInt("totallike") + 1;
+			}
+			prepStmt.close();
+			
+    		String selectStatement = "update comment_table " + "set totallike=? " + "where post_id=? ";
+            PreparedStatement prepStmt0 = con.prepareStatement(selectStatement);
+            prepStmt0.setInt(1, totalLike);
+            prepStmt0.setLong(2, commentId);
+            int x = prepStmt0.executeUpdate();
+            if (x == 1) {	
+            	status = true;       
+            } 
+            prepStmt0.close();
+            releaseConnection();
+    		
+    	} catch(SQLException ex) {
+    		releaseConnection();
+            ex.printStackTrace();
+    	}
+    	return status;
+    }
+    
+    public boolean addDislike(Long commentId) {
+    	boolean status = false;
+    	try {
+    		String select = "select totaldislike from comment_table where post_id = ?";
+			getConnection();
+			PreparedStatement prepStmt = con.prepareStatement(select);
+			prepStmt.setLong(1, commentId);
+			ResultSet rs = prepStmt.executeQuery();
+			int totalDislike = 0;
+			if (rs.next()) {
+				totalDislike = rs.getInt("totaldislike") + 1;
+			}
+			prepStmt.close();
+			
+    		String selectStatement = "update comment_table " + "set totaldislike=? " + "where post_id=? ";
+            PreparedStatement prepStmt0 = con.prepareStatement(selectStatement);
+            prepStmt0.setInt(1, totalDislike);
+            prepStmt0.setLong(2, commentId);
+            int x = prepStmt0.executeUpdate();
+            if (x == 1) {	
+            	status = true;       
+            } 
+            prepStmt0.close();
+            releaseConnection();
+    		
+    	} catch(SQLException ex) {
+    		releaseConnection();
+            ex.printStackTrace();
+    	}
+    	return status;
+    }
+    
+    public boolean addLove(Long commentId) {
+    	boolean status = false;
+    	try {
+    		String select = "select totallove from comment_table where post_id = ?";
+			getConnection();
+			PreparedStatement prepStmt = con.prepareStatement(select);
+			prepStmt.setLong(1, commentId);
+			ResultSet rs = prepStmt.executeQuery();
+			int totalLove = 0;
+			if (rs.next()) {
+				totalLove = rs.getInt("totallove") + 1;
+			}
+			prepStmt.close();
+			
+    		String selectStatement = "update comment_table " + "set totallove=? " + "where post_id=? ";
+            PreparedStatement prepStmt0 = con.prepareStatement(selectStatement);
+            prepStmt0.setInt(1, totalLove);
+            prepStmt0.setLong(2, commentId);
+            int x = prepStmt0.executeUpdate();
+            if (x == 1) {	
+            	status = true;       
+            } 
+            prepStmt0.close();
+            releaseConnection();
+    		
+    	} catch(SQLException ex) {
+    		releaseConnection();
+            ex.printStackTrace();
+    	}
+    	return status;
+    }
+    
+    public boolean deleteLove(Long commentId) {
+    	boolean status = false;
+    	try {
+    		String select = "select totallove from comment_table where post_id = ?";
+			getConnection();
+			PreparedStatement prepStmt = con.prepareStatement(select);
+			prepStmt.setLong(1, commentId);
+			ResultSet rs = prepStmt.executeQuery();
+			int totalLove = 0;
+			if (rs.next()) {
+				totalLove = rs.getInt("totallove") - 1;
+			}
+			prepStmt.close();
+			
+    		String selectStatement = "update comment_table " + "set totallove=? " + "where post_id=? ";
+            PreparedStatement prepStmt0 = con.prepareStatement(selectStatement);
+            prepStmt0.setInt(1, totalLove);
+            prepStmt0.setLong(2, commentId);
+            int x = prepStmt0.executeUpdate();
+            if (x == 1) {	
+            	status = true;       
+            } 
+            prepStmt0.close();
+            releaseConnection();
+    		
+    	} catch(SQLException ex) {
+    		releaseConnection();
+            ex.printStackTrace();
+    	}
+    	return status;
+    }
+    
     public boolean deleteComment(Long id) {
     	boolean status = false;
     	try {

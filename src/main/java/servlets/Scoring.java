@@ -57,7 +57,8 @@ public class Scoring extends HttpServlet {
 			}
 			ScoreDBAO scoredbao = new ScoreDBAO();
 			boolean x = scoredbao.insertReason(id, game_id, score, content);
-			if(x == false) {
+			boolean y = scoredbao.updateScore(game_id);
+			if(x == false || y == false) {
 				JSONObject jsonObject=new JSONObject() ; 
 				jsonObject.put("message", "Score failed! "); 
 				out.write(jsonObject.toString()); 
