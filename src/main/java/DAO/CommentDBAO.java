@@ -171,16 +171,32 @@ public class CommentDBAO {
 				totalLike = rs.getInt("totallike") + 1;
 			}
 			prepStmt.close();
-			
-    		String selectStatement = "update comment_table " + "set totallike=? " + "where post_id=? ";
-            PreparedStatement prepStmt0 = con.prepareStatement(selectStatement);
-            prepStmt0.setInt(1, totalLike);
-            prepStmt0.setLong(2, commentId);
-            int x = prepStmt0.executeUpdate();
-            if (x == 1) {	
+			if(totalLike == 1000) {
+				String selectStatement = "update comment_table " + "set totallike=?,is_get_coin=? " + "where post_id=? ";
+				PreparedStatement prepStmt0 = con.prepareStatement(selectStatement);
+				prepStmt0.setInt(1, totalLike);
+				prepStmt0.setInt(2, 1);
+				prepStmt0.setLong(3, commentId);
+           
+				int x = prepStmt0.executeUpdate();
+				if (x == 1) {	
             	status = true;       
-            } 
-            prepStmt0.close();
+				} 
+				prepStmt0.close();
+			}
+			else {
+				String selectStatement = "update comment_table " + "set totallike=? " + "where post_id=? ";
+				PreparedStatement prepStmt0 = con.prepareStatement(selectStatement);
+				prepStmt0.setInt(1, totalLike);
+				prepStmt0.setLong(2, commentId);
+           
+				int x = prepStmt0.executeUpdate();
+				if (x == 1) {	
+            	status = true;       
+				} 
+				prepStmt0.close(); 
+            }
+			
             releaseConnection();
     		
     	} catch(SQLException ex) {

@@ -12,20 +12,21 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import DAO.CommentDBAO;
+import DAO.ReplyDBAO;
 import DAO.UserDBAO;
 import net.sf.json.JSONObject;
 
 /**
- * Servlet implementation class NewComment
+ * Servlet implementation class NewReply
  */
-@WebServlet("/NewComment")
-public class NewComment extends HttpServlet {
+@WebServlet("/NewReply")
+public class NewReply extends HttpServlet {
 	private static final long serialVersionUID = 1L;
        
     /**
      * @see HttpServlet#HttpServlet()
      */
-    public NewComment() {
+    public NewReply() {
         super();
         // TODO Auto-generated constructor stub
     }
@@ -35,8 +36,8 @@ public class NewComment extends HttpServlet {
 	 */
 	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 		// TODO Auto-generated method stub
-		Long game_id = Long.parseLong(request.getParameter("game_id"));
-		String content = request.getParameter("content");
+		Long post_id = Long.parseLong(request.getParameter("post_id"));
+		String reply = request.getParameter("content");
 		try {
 			PrintWriter out = response.getWriter();
 			UserDBAO userdbao = new UserDBAO();
@@ -54,19 +55,17 @@ public class NewComment extends HttpServlet {
 					}
 				}
 			}
-			CommentDBAO commentdbao = new CommentDBAO();
-			boolean x = commentdbao.insertComment(id, game_id, content);
+			ReplyDBAO replydbao = new ReplyDBAO();
+			boolean x = replydbao.insertReply(post_id, id, reply);
 			if(x == false) {
 				JSONObject jsonObject=new JSONObject() ; 
-				jsonObject.put("message", "Comment failed! "); 
+				jsonObject.put("message", "Reply failed! "); 
 				out.write(jsonObject.toString()); 
 				out.flush(); 
 				return; 
 			}
-			boolean y = userdbao.addCoin(id,1);
-			
 			JSONObject jsonObject=new JSONObject() ; 
-			jsonObject.put("message", "Comment successfully! "); 
+			jsonObject.put("message", "Reply successfully! "); 
 			out.write(jsonObject.toString()); 
 			out.flush(); 
 			return; 

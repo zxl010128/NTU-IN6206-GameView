@@ -142,7 +142,7 @@ public class UserDBAO {
 	        return null;
 	    }
 
-	public boolean register(String username, String password, String facepicture, String phonenumber, String email,
+	public boolean register(String username, String password, String phonenumber, String email,
 			String dob, int gender) {
 		boolean status = false;
 		try {
@@ -167,7 +167,7 @@ public class UserDBAO {
 			prepStmt.setLong(1, user_id);
 			prepStmt.setString(2, username);
 			prepStmt.setString(3, password);
-			prepStmt.setString(4, facepicture);
+			prepStmt.setString(4, "");
 			prepStmt.setString(5, phonenumber);
 			prepStmt.setString(6, email);
 			prepStmt.setString(7, dob);
@@ -252,6 +252,38 @@ public class UserDBAO {
 			ex.printStackTrace();
 		}
 		return status;
+	}
+	
+	public boolean addCoin(Long userId, int num) {
+		boolean status = false;
+    	try {
+    		String select = "select coin from profile_table where user_id = ?";
+			getConnection();
+			PreparedStatement prepStmt = con.prepareStatement(select);
+			prepStmt.setLong(1, userId);
+			ResultSet rs = prepStmt.executeQuery();
+			int coin = 0;
+			if (rs.next()) {
+				coin = rs.getInt("coin") + num;
+			}
+			prepStmt.close();
+			
+    		String selectStatement = "update profile_table " + "set coin=? " + "where user_id=? ";
+            PreparedStatement prepStmt0 = con.prepareStatement(selectStatement);
+            prepStmt0.setInt(1, coin);
+            prepStmt0.setLong(2, userId);
+            int x = prepStmt0.executeUpdate();
+            if (x == 1) {	
+            	status = true;       
+            } 
+            prepStmt0.close();
+            releaseConnection();
+    		
+    	} catch(SQLException ex) {
+    		releaseConnection();
+            ex.printStackTrace();
+    	}
+    	return status;
 	}
 
 	

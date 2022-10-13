@@ -42,7 +42,7 @@ public class Register extends HttpServlet {
 
 		String phonenumber = request.getParameter("phonenumber"); 
 
-		String facepicture = request.getParameter("facepicture"); 
+		//String facepicture = request.getParameter("facepicture"); 
 
 		String password = request.getParameter("password"); 
 
@@ -85,7 +85,7 @@ public class Register extends HttpServlet {
 //			boolean y = userdbao.validationCode();
  
 
-			boolean y = userdbao.register(username,password,facepicture,phonenumber,email,dob,gender); 
+			boolean y = userdbao.register(username,password,phonenumber,email,dob,gender); 
 			if (y == true) { 
 				JSONObject jsonObject=new JSONObject(); 
 				jsonObject.put("message", "Register Succeeded"); 

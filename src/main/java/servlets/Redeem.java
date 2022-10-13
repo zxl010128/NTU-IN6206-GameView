@@ -11,21 +11,21 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import DAO.CommentDBAO;
 import DAO.UserDBAO;
+import DAO.ProductDBAO;
 import net.sf.json.JSONObject;
 
 /**
- * Servlet implementation class NewComment
+ * Servlet implementation class Redeem
  */
-@WebServlet("/NewComment")
-public class NewComment extends HttpServlet {
+@WebServlet("/Redeem")
+public class Redeem extends HttpServlet {
 	private static final long serialVersionUID = 1L;
        
     /**
      * @see HttpServlet#HttpServlet()
      */
-    public NewComment() {
+    public Redeem() {
         super();
         // TODO Auto-generated constructor stub
     }
@@ -35,10 +35,11 @@ public class NewComment extends HttpServlet {
 	 */
 	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 		// TODO Auto-generated method stub
-		Long game_id = Long.parseLong(request.getParameter("game_id"));
-		String content = request.getParameter("content");
-		try {
-			PrintWriter out = response.getWriter();
+		
+
+		Long product_id = Long.parseLong(request.getParameter("product_id")); 
+
+		try { 
 			UserDBAO userdbao = new UserDBAO();
 			Cookie[] cookie = request.getCookies();
 			Long id = (long)0;
@@ -48,34 +49,33 @@ public class NewComment extends HttpServlet {
 					if(id == 0) {
 						JSONObject jsonObject=new JSONObject(); 
 						jsonObject.put("message", "Please login ");
+						PrintWriter out = response.getWriter(); 
 						out.write(jsonObject.toString()); 
 						out.flush();    
 						return; 
 					}
 				}
 			}
-			CommentDBAO commentdbao = new CommentDBAO();
-			boolean x = commentdbao.insertComment(id, game_id, content);
-			if(x == false) {
+			PrintWriter out = response.getWriter(); 
+			ProductDBAO productdbao = new ProductDBAO();
+			boolean x = productdbao.redeemProduct(product_id,id);
+			System.out.println(x);
+			if (x == false) { 
 				JSONObject jsonObject=new JSONObject() ; 
-				jsonObject.put("message", "Comment failed! "); 
+				jsonObject.put("message", "Redeem failed! "); 
 				out.write(jsonObject.toString()); 
 				out.flush(); 
 				return; 
+			} 
+				JSONObject jsonObject=new JSONObject(); 
+				jsonObject.put("message", "Redeem Succeeded! "); 
+				out.write(jsonObject.toString()); 
+				out.flush();    
+				return;  
+		} catch (Exception e) { 
+			// TODO Auto-generated catch block 
+			e.printStackTrace(); 
 			}
-			boolean y = userdbao.addCoin(id,1);
-			
-			JSONObject jsonObject=new JSONObject() ; 
-			jsonObject.put("message", "Comment successfully! "); 
-			out.write(jsonObject.toString()); 
-			out.flush(); 
-			return; 
-			
-		} catch (Exception e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-		
 		
 		}
 

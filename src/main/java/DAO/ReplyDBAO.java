@@ -74,7 +74,7 @@ public class ReplyDBAO {
     		ResultSet rs = prepStmt.executeQuery();	
     		
     		while(rs.next()) {
-    			Reply rpl = new Reply(rs.getLong("reply_id"), rs.getDate("createtime"), rs.getString("content"), rs.getLong("user_id"), rs.getLong("post_id"), rs.getLong("reply_to_id"));
+    			Reply rpl = new Reply(rs.getLong("reply_id"), rs.getDate("createtime"), rs.getString("content"), rs.getLong("user_id"), rs.getLong("post_id"));
     			replys.add(rpl);
     		}
     		prepStmt.close();
@@ -86,17 +86,30 @@ public class ReplyDBAO {
     	return replys;
     }
     
-    public boolean insertReply(Long userId, Long commentId, String content, Long replyToId) {
+    public boolean insertReply(Long commentId, Long userId, String content) {
     	boolean status = false;
     	try {
-    		String selectStatement = "insert into reply_table(post_id, user_id, content, createtime, reply_to_id) values (?,?,?,?,?);";
+    		String selectStatement = "insert into reply_table(reply_id,post_id,user_id,createtime,content) values (?,?,?,?,?);";
     		getConnection();
     		PreparedStatement prepStmt = con.prepareStatement(selectStatement);
-    		prepStmt.setLong(1, commentId);
-    		prepStmt.setLong(2, userId);
-    		prepStmt.setString(3, content);
+    		
+    		Long maxID = (long) 0;
+			String selectMaxid = "select MAX(reply_id) as maxid from reply_table";
+			Statement statement = con.createStatement();
+			ResultSet rs = statement.executeQuery(selectMaxid);
+			if (rs.next()) {
+				maxID = rs.getLong("maxid");
+				// System.out.println(maxID);
+			}
+			statement.close();
+
+			Long reply_id = maxID + 1;
+			
+			prepStmt.setLong(1, reply_id);
+    		prepStmt.setLong(2, commentId);
+    		prepStmt.setLong(3, userId);
     		prepStmt.setDate(4, new Date(new java.util.Date().getTime()));
-    		prepStmt.setLong(5, replyToId);
+    		prepStmt.setString(5, content);
     		
     		int x = prepStmt.executeUpdate();
             if (x == 1) {
@@ -111,6 +124,7 @@ public class ReplyDBAO {
     		ex.printStackTrace();
     	}
     	return status;
-    	
     }
+    
+    
 }
