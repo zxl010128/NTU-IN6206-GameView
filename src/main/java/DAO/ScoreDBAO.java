@@ -68,7 +68,7 @@ public class ScoreDBAO {
     	int avgScore = 0;
     	int totalusers = 0;
     	try {
-			 String selectStatement = "select AVG(score) as averageScore,COUNT(scoring_id) as totalUsers from scoring_table where game_id=?";
+			 String selectStatement = "select AVG(score) as averageScore,COUNT(user_id) as totalUsers from scoring_table where game_id=?";
 			 getConnection();  	
 			 PreparedStatement prepStmt = con.prepareStatement(selectStatement);
 			 prepStmt.setLong(1, gameId);  
@@ -150,7 +150,7 @@ public class ScoreDBAO {
         		prepStmt.setLong(3, userId);
         		prepStmt.setInt(4, score);
         		prepStmt.setString(5, reasons);
-        		prepStmt.setDate(6, new Date(new java.util.Date().getTime()));
+        		prepStmt.setTimestamp(6, new java.sql.Timestamp(new java.util.Date().getTime()));
         		
         		int x = prepStmt.executeUpdate();
                 if (x == 1) {
@@ -164,7 +164,7 @@ public class ScoreDBAO {
     		
     			prepStmt.setInt(1, score);
     			prepStmt.setString(2, reasons);
-    			prepStmt.setDate(3, new Date(new java.util.Date().getTime()));
+    			prepStmt.setTimestamp(3, new java.sql.Timestamp(new java.util.Date().getTime()));
     			prepStmt.setLong(4, userId);
     		
     			int x = prepStmt.executeUpdate();

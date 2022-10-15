@@ -34,16 +34,52 @@ public class Profile extends HttpServlet {
 	 */
 	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 		// TODO Auto-generated method stub
-		PrintWriter out = response.getWriter();
 		Long user_id = Long.parseLong(request.getParameter("user_id"));
 		try {
 			UserDBAO userdbao = new UserDBAO();
 			User user = userdbao.findByUserid(user_id);
-			request.setAttribute("user", user);
+//			request.setAttribute("user", user);
+			
+			PrintWriter out = response.getWriter(); 
+//			JSONObject jsonObject=new JSONObject(); 
+//			jsonObject.put("user_name", user.getUserName());
+//			jsonObject.put("facepicture", user.getfacepic());
+//			jsonObject.put("phonenumber", user.getphone());
+//			jsonObject.put("email", user.getemail());
+//			jsonObject.put("dob", user.getdob());
+//			jsonObject.put("gender", user.getgender());
+//			out.write(jsonObject.toString()); 
+//			out.flush();
+//			out.close();
+			
+			if (user==null) {
+				JSONObject json = new JSONObject();
+				json.put("data", "");
+				json.put("message", "fail");
+				json.put("status_code", 400);
+				out.write(json.toString());
+				out.flush();
+				out.close();
+				return;
+			}
+			else {
+				JSONObject datajson = JSONObject.fromObject(user);
+				JSONObject json = new JSONObject();
+				json.put("data", datajson);
+				json.put("message", "success");
+				json.put("status_code", 200);
+				out.write(json.toString());
+				out.flush();
+				out.close();
+				return;
+			}
+		
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
+		//redirect
+		
 		}
 
 	/**

@@ -49,41 +49,54 @@ public class Login extends HttpServlet {
 		if(input.contains("@")) {
 			ifExists = userdbao.ifEmailExists(input);
 			if(ifExists == false){
-				JSONObject jsonObject=new JSONObject(); 
-				jsonObject.put("message", "Email doesn't exist! "); 
+//				jsonObject.put("message", "Email doesn't exist! ");
+				JSONObject jsonObject = new JSONObject();
+				jsonObject.put("data", "");
+				jsonObject.put("message", "email doesn't exist");
+				jsonObject.put("status_code", 400); 
 				out.write(jsonObject.toString()); 
 				out.flush(); 
-				return; 
+				out.close();
+				return;
 			}
 			x = userdbao.loginByEmail(input, password);
 		}
 		else {
 			ifExists = userdbao.checkUsernameExists(input);
 			if(ifExists == false){
-				JSONObject jsonObject=new JSONObject(); 
-				jsonObject.put("message", "Username doesn't exist! "); 
+				JSONObject jsonObject = new JSONObject();
+				jsonObject.put("data", "");
+				jsonObject.put("message", "username doesn't exit");
+				jsonObject.put("status_code", 400); 
 				out.write(jsonObject.toString()); 
 				out.flush(); 
-				return; 
+				out.close();
+				return;
 			}
 			x  = userdbao.loginByUsername(input, password); 
 		}
 		if (x == false) { 
-		JSONObject jsonObject=new JSONObject(); 
-		jsonObject.put("message", "Wrong Password! "); 
-		out.write(jsonObject.toString()); 
-		out.flush(); 
-		return; 
+			JSONObject jsonObject = new JSONObject();
+			jsonObject.put("data", "");
+			jsonObject.put("message", "password is wrong");
+			jsonObject.put("status_code", 400); 
+			out.write(jsonObject.toString()); 
+			out.flush(); 
+			out.close();
+			return;
 		} 
 		
-		JSONObject jsonObject=new JSONObject() ; 
 		// token 
 		String token = userdbao.generateToken(input);
 		if(token.equals("")) {
-			jsonObject.put("message", "Login Failed "); 	 
+			JSONObject jsonObject = new JSONObject();
+			jsonObject.put("data", "");
+			jsonObject.put("message", "fail");
+			jsonObject.put("status_code", 500); 
 			out.write(jsonObject.toString()); 
-			out.flush();    
-			return; 
+			out.flush(); 
+			out.close();
+			return;
 		}
 		
 		Cookie cookie = new Cookie("token",token);
@@ -91,10 +104,14 @@ public class Login extends HttpServlet {
 		cookie.setPath("/");
 		response.addCookie(cookie);
 		
-		jsonObject.put("message", "Login Succeeded "); 	 
+		JSONObject jsonObject = new JSONObject();
+		jsonObject.put("data", "");
+		jsonObject.put("message", "success");
+		jsonObject.put("status_code", 200); 
 		out.write(jsonObject.toString()); 
-		out.flush();    
-		return; 
+		out.flush(); 
+		out.close();
+		return;
 		} catch (Exception e) { 
 		// TODO Auto-generated catch block 
 		e.printStackTrace(); 

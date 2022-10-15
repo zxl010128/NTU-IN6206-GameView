@@ -56,20 +56,26 @@ public class Register extends HttpServlet {
 			UserDBAO userdbao = new UserDBAO(); 
 			boolean email_exists = userdbao.ifEmailExists(email); 
 			if (email_exists == true) { 
-				JSONObject jsonObject=new JSONObject() ; 
-				jsonObject.put("message", "Email Already Existed! "); 
+				JSONObject jsonObject = new JSONObject();
+				jsonObject.put("data", "");
+				jsonObject.put("message", "email existed");
+				jsonObject.put("status_code", 400);
 				out.write(jsonObject.toString()); 
 				out.flush(); 
-				return; 
+				out.close();
+				return;
 			} 
 			
 			boolean username_exists = userdbao.checkUsernameExists(username); 
 			if (username_exists == true) { 
-				JSONObject jsonObject=new JSONObject() ; 
-				jsonObject.put("message", "Username Already Existed! "); 
+				JSONObject jsonObject = new JSONObject();
+				jsonObject.put("data", "");
+				jsonObject.put("message", "username existed");
+				jsonObject.put("status_code", 400);
 				out.write(jsonObject.toString()); 
 				out.flush(); 
-				return; 
+				out.close();
+				return;
 			} 
 //			//generate validation code and send email
 //			boolean x = userdbao.sendResetCode(email); 
@@ -87,19 +93,24 @@ public class Register extends HttpServlet {
 
 			boolean y = userdbao.register(username,password,phonenumber,email,dob,gender); 
 			if (y == true) { 
-				JSONObject jsonObject=new JSONObject(); 
-				jsonObject.put("message", "Register Succeeded"); 
+				JSONObject jsonObject = new JSONObject();
+				jsonObject.put("data", "");
+				jsonObject.put("message", "success");
+				jsonObject.put("status_code", 200);
 				out.write(jsonObject.toString()); 
-				out.flush();    
-				return; 
+				out.flush(); 
+				out.close();
 			} 
 
 			else { 
-				JSONObject jsonObject=new JSONObject(); 
-				jsonObject.put("message", "Register Failed"); 
+				JSONObject jsonObject = new JSONObject();
+				jsonObject.put("data", "");
+				jsonObject.put("message", "fail");
+				jsonObject.put("status_code", 500); 
 				out.write(jsonObject.toString()); 
-				out.flush();    
-				return; 
+				out.flush(); 
+				out.close();
+				return;
 			} 
 		} catch (Exception e) { 
 			// TODO Auto-generated catch block 

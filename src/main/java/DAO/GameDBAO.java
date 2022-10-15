@@ -73,7 +73,7 @@ public class GameDBAO {
     public List<Game> findByCategory(String category) {
     	List<Game> games = new ArrayList<Game>();  
 		try {
-			 String selectStatement = "select game_id, gamename, gamepicture, category, introduction, totalscore, number_of_user_rated " + "from game_table where category = ?"; 
+			 String selectStatement = "select game_id, gamename, gamepicture, category, introduction, totalscore, number_of_users_rated " + "from game_table where category = ?"; 
 			 getConnection();  	
 			 PreparedStatement prepStmt = con.prepareStatement(selectStatement);
 		     prepStmt.setString(1, category);
@@ -95,7 +95,7 @@ public class GameDBAO {
     public Game findById(Long id) {
     	Game game = new Game();  
 		try {
-			 String selectStatement = "select game_id, gamename, gamepicture, category, introduction, totalscore, number_of_user_rated " + "from game_table where game_id = ?"; 
+			 String selectStatement = "select game_id, gamename, gamepicture, category, introduction, totalscore, number_of_users_rated " + "from game_table where game_id = ?"; 
 			 getConnection();  	
 			 PreparedStatement prepStmt = con.prepareStatement(selectStatement);
 		     prepStmt.setLong(1, id);
@@ -114,16 +114,16 @@ public class GameDBAO {
         return game;
     }
     
-    public List<Game> rankByScore(String category){
+    public List<Game> rankByScore(){
     	List<Game> games = new ArrayList<Game>();
     	try {
-    		String selectStatement = "select gamename,totalscore from game_table where category=? order by totalscore limit 10";
+    		String selectStatement = "select gamename,totalscore,gamepicture from game_table order by totalscore limit 10";
     		getConnection();
     		PreparedStatement prepStmt = con.prepareStatement(selectStatement);
     		ResultSet rs = prepStmt.executeQuery();	
    
     		while(rs.next()) {
-    			Game gm = new Game(rs.getString("gamename"), rs.getInt("totalscore"));
+    			Game gm = new Game(rs.getString("gamename"), rs.getInt("totalscore"), rs.getString("gamepicture"));
     			games.add(gm);
     		}
     		prepStmt.close();

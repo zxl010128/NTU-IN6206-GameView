@@ -11,6 +11,7 @@ import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import net.sf.json.JSONArray;
 
 import DAO.GameDBAO;
 import entity.Game;
@@ -42,11 +43,46 @@ public class Discussion extends HttpServlet {
 		try {
 			GameDBAO gamedbao = new GameDBAO();
 			games = gamedbao.findByCategory(category);
-			request.setAttribute("games", games);
+			
+			if(games==null) {
+				JSONObject json = new JSONObject();
+				json.put("data", "");
+				json.put("message", "fail");
+				json.put("status_code", 400);
+				out.write(json.toString());
+				out.flush();
+				out.close();
+				return;
+			}
+			
+			else {
+				JSONArray datajson = new JSONArray();
+				for (int i = 0; i < games.size(); i++) {
+					Game game = games.get(i);
+					//				datajson.put("gamename", game.getGameName());
+					//				datajson.put("gamepicture", game.getGamePicture());
+					//				datajson.put("introduction",game.getIntroduction());
+					//				datajson.put("totalscore", game.getScore());
+					//				datajson.put("number_of_user_rated", game.getRateNum());
+					JSONObject gameobject = JSONObject.fromObject(game);
+					datajson.add(gameobject);
+				}
+				JSONObject json = new JSONObject();
+				json.put("data", datajson);
+				json.put("message", "success");
+				json.put("status_code", 200);
+				out.write(json.toString());
+				out.flush();
+				out.close();
+				return;
+			}
+			
+			
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
+		
 		}
 
 	/**

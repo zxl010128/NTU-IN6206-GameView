@@ -40,38 +40,64 @@ public class Redeem extends HttpServlet {
 		Long product_id = Long.parseLong(request.getParameter("product_id")); 
 
 		try { 
+			PrintWriter out = response.getWriter();
 			UserDBAO userdbao = new UserDBAO();
 			Cookie[] cookie = request.getCookies();
 			Long id = (long)0;
+			if(cookie == null) {
+				JSONObject jsonObject = new JSONObject();
+				jsonObject.put("data", "");
+				jsonObject.put("message", "fail");
+				jsonObject.put("status_code", 401);
+				out.write(jsonObject.toString()); 
+				out.flush(); 
+				out.close();
+				return; 
+			}
 			for(int i=0;i<cookie.length;i++) {
 				if("token".equals(cookie[i].getName())) {
 					id = userdbao.identifyId(cookie[i].getValue());
 					if(id == 0) {
-						JSONObject jsonObject=new JSONObject(); 
-						jsonObject.put("message", "Please login ");
-						PrintWriter out = response.getWriter(); 
+						JSONObject jsonObject = new JSONObject();
+						jsonObject.put("data", "");
+						jsonObject.put("message", "fail");
+						jsonObject.put("status_code", 401);
 						out.write(jsonObject.toString()); 
-						out.flush();    
+						out.flush(); 
+						out.close();
 						return; 
 					}
 				}
 			}
-			PrintWriter out = response.getWriter(); 
 			ProductDBAO productdbao = new ProductDBAO();
 			boolean x = productdbao.redeemProduct(product_id,id);
 			System.out.println(x);
 			if (x == false) { 
-				JSONObject jsonObject=new JSONObject() ; 
-				jsonObject.put("message", "Redeem failed! "); 
+				JSONObject jsonObject = new JSONObject();
+				jsonObject.put("data", "");
+				jsonObject.put("message", "fail");
+				jsonObject.put("status_code", 403); 
 				out.write(jsonObject.toString()); 
 				out.flush(); 
-				return; 
+				out.close();
+				return;
 			} 
-				JSONObject jsonObject=new JSONObject(); 
-				jsonObject.put("message", "Redeem Succeeded! "); 
-				out.write(jsonObject.toString()); 
-				out.flush();    
-				return;  
+			
+			//find email by id
+			String email = userdbao.findEmailById(id);
+			//find product key by id
+			String productkey = productdbao.findKeyById(product_id);
+			// send product key
+			boolean y = productdbao.sendProduct(email,productkey);
+			
+			JSONObject jsonObject=new JSONObject();
+			jsonObject.put("data", "");
+			jsonObject.put("status_code", 200); 
+			jsonObject.put("message", "success"); 
+			out.write(jsonObject.toString()); 
+			out.flush();
+			out.close();
+			return; 
 		} catch (Exception e) { 
 			// TODO Auto-generated catch block 
 			e.printStackTrace(); 

@@ -42,14 +42,27 @@ public class NewComment extends HttpServlet {
 			UserDBAO userdbao = new UserDBAO();
 			Cookie[] cookie = request.getCookies();
 			Long id = (long)0;
+			if(cookie == null) {
+				JSONObject jsonObject = new JSONObject();
+				jsonObject.put("data", "");
+				jsonObject.put("message", "fail");
+				jsonObject.put("status_code", 401);
+				out.write(jsonObject.toString()); 
+				out.flush(); 
+				out.close();
+				return; 
+			}
 			for(int i=0;i<cookie.length;i++) {
 				if("token".equals(cookie[i].getName())) {
 					id = userdbao.identifyId(cookie[i].getValue());
 					if(id == 0) {
-						JSONObject jsonObject=new JSONObject(); 
-						jsonObject.put("message", "Please login ");
+						JSONObject jsonObject = new JSONObject();
+						jsonObject.put("data", "");
+						jsonObject.put("message", "fail");
+						jsonObject.put("status_code", 401);
 						out.write(jsonObject.toString()); 
-						out.flush();    
+						out.flush(); 
+						out.close();
 						return; 
 					}
 				}
@@ -57,19 +70,37 @@ public class NewComment extends HttpServlet {
 			CommentDBAO commentdbao = new CommentDBAO();
 			boolean x = commentdbao.insertComment(id, game_id, content);
 			if(x == false) {
-				JSONObject jsonObject=new JSONObject() ; 
-				jsonObject.put("message", "Comment failed! "); 
+				JSONObject jsonObject = new JSONObject();
+				jsonObject.put("data", "");
+				jsonObject.put("message", "fail");
+				jsonObject.put("status_code", 500); 
 				out.write(jsonObject.toString()); 
 				out.flush(); 
-				return; 
+				out.close();
+				return;
 			}
-			boolean y = userdbao.addCoin(id,1);
-			
-			JSONObject jsonObject=new JSONObject() ; 
-			jsonObject.put("message", "Comment successfully! "); 
-			out.write(jsonObject.toString()); 
-			out.flush(); 
-			return; 
+			else {
+				boolean y = userdbao.addCoin(id, 1);
+				if(y == false){
+					JSONObject jsonObject = new JSONObject();
+					jsonObject.put("data", "");
+					jsonObject.put("message", "fail");
+					jsonObject.put("status_code", 500); 
+					out.write(jsonObject.toString()); 
+					out.flush(); 
+					out.close();
+					return;
+				}
+				else{
+					JSONObject jsonObject = new JSONObject();
+					jsonObject.put("data", "");
+					jsonObject.put("message", "success");
+					jsonObject.put("status_code", 200); 
+					out.write(jsonObject.toString()); 
+					out.flush(); 
+					out.close();
+					return;}
+			} 
 			
 		} catch (Exception e) {
 			// TODO Auto-generated catch block

@@ -38,25 +38,34 @@ public class Reset extends HttpServlet {
 		UserDBAO userdbao = new UserDBAO(); 
 		boolean x  = userdbao.ifEmailExists(email); 
 		if (x == false) { 
-		JSONObject jsonObject=new JSONObject(); 
-		jsonObject.put("message", "Email hasn't been registered! "); 
-		out.write(jsonObject.toString()); 
-		out.flush(); 
-		return; 
+			JSONObject jsonObject = new JSONObject();
+			jsonObject.put("data", "");
+			jsonObject.put("message", "fail");
+			jsonObject.put("status_code", 400); 
+			out.write(jsonObject.toString()); 
+			out.flush(); 
+			out.close();
+			return;
 		} 
 		//reset code 
 		boolean y = userdbao.sendResetCode(email); 
 		if (y == false) { 
-		JSONObject jsonObject=new JSONObject() ; 
-		jsonObject.put("message", "Failed to send email! "); 
-		out.write(jsonObject.toString()); 
-		out.flush(); 
-		return; 
+			JSONObject jsonObject = new JSONObject();
+			jsonObject.put("data", "");
+			jsonObject.put("message", "fail");
+			jsonObject.put("status_code", 500); 
+			out.write(jsonObject.toString()); 
+			out.flush(); 
+			out.close();
+			return;
 		} 
-		JSONObject jsonObject=new JSONObject() ; 
-		jsonObject.put("message", "Reset code has been sent! "); 
+		JSONObject jsonObject=new JSONObject();
+		jsonObject.put("data", "");
+		jsonObject.put("status_code", 200); 
+		jsonObject.put("message", "success"); 
 		out.write(jsonObject.toString()); 
-		out.flush();    
+		out.flush();
+		out.close();
 		return; 
 		} catch (Exception e) { 
 		// TODO Auto-generated catch block 

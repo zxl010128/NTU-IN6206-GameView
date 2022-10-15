@@ -12,19 +12,20 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import DAO.UserDBAO;
+import DAO.CommentDBAO;
 import net.sf.json.JSONObject;
 
 /**
- * Servlet implementation class ChangeProfile
+ * Servlet implementation class MarkComment
  */
-@WebServlet("/ChangeProfile")
-public class ChangeProfile extends HttpServlet {
+@WebServlet("/MarkComment")
+public class MarkComment extends HttpServlet {
 	private static final long serialVersionUID = 1L;
        
     /**
      * @see HttpServlet#HttpServlet()
      */
-    public ChangeProfile() {
+    public MarkComment() {
         super();
         // TODO Auto-generated constructor stub
     }
@@ -34,19 +35,11 @@ public class ChangeProfile extends HttpServlet {
 	 */
 	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 		// TODO Auto-generated method stub
-		
-//		Long id = Long.parseLong(request.getParameter("user_id")); 
-		String username = request.getParameter("username"); 
-		String email = request.getParameter("email"); 
-		String phonenumber = request.getParameter("phonenumber"); 
-		String facepicture = request.getParameter("facepicture"); 
-		String password = request.getParameter("password"); 
-		String dob = request.getParameter("dob"); 
-		int gender = Integer.parseInt(request.getParameter("gender")); 
-		
-		try { 
+		Long post_id = Long.parseLong(request.getParameter("post_id"));
+		try {
 			PrintWriter out = response.getWriter();
 			UserDBAO userdbao = new UserDBAO();
+			CommentDBAO commentdbao = new CommentDBAO();
 			Cookie[] cookie = request.getCookies();
 			Long id = (long)0;
 			if(cookie == null) {
@@ -74,8 +67,8 @@ public class ChangeProfile extends HttpServlet {
 					}
 				}
 			}
-			boolean x = userdbao.changeProfile(username, facepicture, password, email, phonenumber, gender, dob, id);
-			if (x == false) {
+			boolean x = userdbao.newBookmark(id, post_id);
+			if(x == false) {
 				JSONObject jsonObject = new JSONObject();
 				jsonObject.put("data", "");
 				jsonObject.put("message", "fail");
@@ -84,12 +77,20 @@ public class ChangeProfile extends HttpServlet {
 				out.flush(); 
 				out.close();
 				return;
-//				JSONObject jsonObject=new JSONObject() ; 
-//				jsonObject.put("message", "Modification failed! "); 
-//				out.write(jsonObject.toString()); 
-//				out.flush(); 
-//				return; 
-			} 
+			}
+			else {
+			boolean y = commentdbao.addLove(post_id);
+			if (y == false) {
+				JSONObject jsonObject = new JSONObject();
+				jsonObject.put("data", "");
+				jsonObject.put("message", "fail");
+				jsonObject.put("status_code", 500); 
+				out.write(jsonObject.toString()); 
+				out.flush(); 
+				out.close();
+				return;
+			}
+			else {
 				JSONObject jsonObject=new JSONObject();
 				jsonObject.put("data", "");
 				jsonObject.put("status_code", 200); 
@@ -98,10 +99,13 @@ public class ChangeProfile extends HttpServlet {
 				out.flush();
 				out.close();
 				return;  
-		} catch (Exception e) { 
-			// TODO Auto-generated catch block 
-			e.printStackTrace(); 
 			}
+			}
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		
 		
 		}
 

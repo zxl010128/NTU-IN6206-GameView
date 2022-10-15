@@ -34,9 +34,10 @@ public class Game {
 		this.score = score;
 	}
 	
-	public Game(String gameName, int score) {
+	public Game(String gameName, int score, String gamepicture) {
 		this.gameName = gameName;
 		this.score = score;
+		this.gamePicture = gamepicture;
 	}
 	
 	public Game(){

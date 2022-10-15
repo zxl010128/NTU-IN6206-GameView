@@ -1,5 +1,7 @@
 package entity;
 
+import java.util.Date;
+
 public class User {
 	
 	private Long id; // user id
@@ -126,6 +128,9 @@ public class User {
 	public void setreset_code(String reset_code) {
 		this.reset_code = reset_code;
 	}
+	
+	private Date createTime;
+	
 	
 	public User(Long id, String userName, String facepic, String phone, String email, String dob, int gender) {
 		this.id = id;

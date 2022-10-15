@@ -41,25 +41,36 @@ public class Validation extends HttpServlet {
 		UserDBAO userdbao = new UserDBAO(); 
 		boolean x  = userdbao.validationCode(email, resetcode); 
 		if (x == false) { 
-		JSONObject jsonObject=new JSONObject(); 
-		jsonObject.put("message", "Reset Code is wrong! "); 
-		out.write(jsonObject.toString()); 
-		out.flush(); 
-		return; 
+			JSONObject json = new JSONObject();
+			json.put("data", "");
+			json.put("message", "fail");
+			json.put("status_code", 400);
+			out.write(json.toString());
+			out.flush();
+			out.close();
+			return;
 		} 
 		boolean y = userdbao.resetPassword(email, newPwd);
 		if(y == false) {
-			JSONObject jsonObject=new JSONObject(); 
-			jsonObject.put("message", "Resetting failed! "); 
+			JSONObject jsonObject = new JSONObject();
+			jsonObject.put("data", "");
+			jsonObject.put("message", "fail");
+			jsonObject.put("status_code", 500); 
 			out.write(jsonObject.toString()); 
 			out.flush(); 
-			return; 
+			out.close();
+			return;
 		}
-		JSONObject jsonObject=new JSONObject() ; 
-		jsonObject.put("message", "Your password has been reset! "); 
-		out.write(jsonObject.toString()); 
-		out.flush();    
-		return; 
+		else{
+			JSONObject jsonObject=new JSONObject();
+			jsonObject.put("data", "");
+			jsonObject.put("status_code", 200); 
+			jsonObject.put("message", "success"); 
+			out.write(jsonObject.toString()); 
+			out.flush();
+			out.close();
+			return;  
+		}
 		} catch (Exception e) { 
 		// TODO Auto-generated catch block 
 		e.printStackTrace(); 

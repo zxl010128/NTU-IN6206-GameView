@@ -120,20 +120,20 @@ public class UserDBAO {
 	
 	public String getMD5(String password) {
 		 try {
-	            MessageDigest md = MessageDigest.getInstance("SHA");//´´½¨¾ßÓÐÖ¸¶¨Ëã·¨Ãû³ÆµÄÕªÒª
-	            md.update(password.getBytes());                    //Ê¹ÓÃÖ¸¶¨µÄ×Ö½ÚÊý×é¸üÐÂÕªÒª
-	            byte mdBytes[] = md.digest();                 //½øÐÐ¹þÏ£¼ÆËã²¢·µ»ØÒ»¸ö×Ö½ÚÊý×é
+	            MessageDigest md = MessageDigest.getInstance("SHA");//ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ö¸ï¿½ï¿½ï¿½ã·¨ï¿½ï¿½ï¿½Æµï¿½ÕªÒª
+	            md.update(password.getBytes());                    //Ê¹ï¿½ï¿½Ö¸ï¿½ï¿½ï¿½ï¿½ï¿½Ö½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ÕªÒª
+	            byte mdBytes[] = md.digest();                 //ï¿½ï¿½ï¿½Ð¹ï¿½Ï£ï¿½ï¿½ï¿½ã²¢ï¿½ï¿½ï¿½ï¿½Ò»ï¿½ï¿½ï¿½Ö½ï¿½ï¿½ï¿½ï¿½ï¿½
 
 	            String hash = "";
-	            for(int i= 0;i<mdBytes.length;i++){           //Ñ­»·×Ö½ÚÊý×é
+	            for(int i= 0;i<mdBytes.length;i++){           //Ñ­ï¿½ï¿½ï¿½Ö½ï¿½ï¿½ï¿½ï¿½ï¿½
 	                int temp;
-	                if(mdBytes[i]<0)                          //Èç¹ûÓÐÐ¡ÓÚ0µÄ×Ö½Ú,Ôò×ª»»ÎªÕýÊý
+	                if(mdBytes[i]<0)                          //ï¿½ï¿½ï¿½ï¿½ï¿½Ð¡ï¿½ï¿½0ï¿½ï¿½ï¿½Ö½ï¿½,ï¿½ï¿½×ªï¿½ï¿½Îªï¿½ï¿½ï¿½ï¿½
 	                    temp =256+mdBytes[i];
 	                else
 	                    temp=mdBytes[i];
 	                if(temp<16)
 	                    hash+= "0";
-	                hash+=Integer.toString(temp,16);         //½«×Ö½Ú×ª»»Îª16½øÖÆºó£¬×ª»»Îª×Ö·û´®
+	                hash+=Integer.toString(temp,16);         //ï¿½ï¿½ï¿½Ö½ï¿½×ªï¿½ï¿½Îª16ï¿½ï¿½ï¿½Æºï¿½×ªï¿½ï¿½Îªï¿½Ö·ï¿½ï¿½ï¿½
 	            }
 	            return hash;
 	        } catch (NoSuchAlgorithmException e) {
@@ -146,7 +146,7 @@ public class UserDBAO {
 			String dob, int gender) {
 		boolean status = false;
 		try {
-			String selectStatement = "insert into profile_table (user_id,username,password,facepicture,phonenumber,email,dob,gender,coin,following_list,fans_list,bookmark_list,token,reset_code) values (?,?,?,?,?,?,?,?,?,?,?,?,?,?);";
+			String selectStatement = "insert into profile_table (user_id,username,password,facepicture,phonenumber,email,dob,gender,coin,following_list,fans_list,bookmark_list,token,reset_code,createtime) values (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?);";
 			getConnection();
 			PreparedStatement prepStmt = con.prepareStatement(selectStatement);
 
@@ -181,6 +181,7 @@ public class UserDBAO {
 			prepStmt.setString(13, "");
 
 			prepStmt.setString(14, "");
+			prepStmt.setTimestamp(15, new java.sql.Timestamp(new java.util.Date().getTime()));
 
 			int x = prepStmt.executeUpdate();
 
@@ -339,24 +340,31 @@ public class UserDBAO {
 		return id;
 	}
 
-	/*
-	 * public List<User> findByName(String name) { List<User> users = new
-	 * ArrayList<User>(); try { String selectStatement =
-	 * "select user_id,username,password,facepicture,phonenumber,email,dob,gender,coin,following_list,fans_list,bookmark_list,token,reset_code "
-	 * + "from profile_table where username = ?"; getConnection(); PreparedStatement
-	 * prepStmt = con.prepareStatement(selectStatement); prepStmt.setString(1,
-	 * name); ResultSet rs = prepStmt.executeQuery(); while (rs.next()) { User user
-	 * = new User(rs.getLong("user_id"), rs.getString("username"),
-	 * rs.getString("password"), rs.getString("facepicture"),
-	 * rs.getString("phonenumber"), rs.getString("email"),rs.getString("dob"),
-	 * rs.getInt("gender"), rs.getInt("coin"), rs.getString("following_list"),
-	 * rs.getString("fans_list"),rs.getString("bookmark_list"),
-	 * rs.getString("token"),rs.getString("reset_code") ); users.add(user); }
-	 * prepStmt.close();
-	 * 
-	 * } catch (SQLException ex) { releaseConnection(); ex.printStackTrace(); }
-	 * releaseConnection(); return users; }
-	 */
+	public String findEmailById(Long id) {
+		String email="";
+		try {
+			String selectStatement = "select email " + "from profile_table where user_id = ?";
+			getConnection();
+			PreparedStatement prepStmt = con.prepareStatement(selectStatement);
+			prepStmt.setLong(1, id);
+			ResultSet rs = prepStmt.executeQuery();
+			if (rs.next()) {
+				email = rs.getString("email");
+				prepStmt.close();
+				releaseConnection();
+
+			} else {
+				prepStmt.close();
+				releaseConnection();
+
+			}
+
+		} catch (SQLException ex) {
+			releaseConnection();
+			ex.printStackTrace();
+		}
+		return email;
+	}
 
 	public boolean loginByEmail(String email, String password) {
 		boolean status = false;
@@ -479,8 +487,8 @@ public class UserDBAO {
 		   Session mailSession = Session.getInstance(props, authenticator); 
 		   MimeMessage message = new MimeMessage(mailSession); 
 		   String username =props.getProperty("mail.user"); 
-		   InternetAddress form = new InternetAddress(username); 
-		   message.setFrom(form); 
+		   InternetAddress from = new InternetAddress(username,"GameView"); 
+		   message.setFrom(from); 
 		   InternetAddress toAddress = new InternetAddress(email); 
 		   message.setRecipient(Message.RecipientType.TO,toAddress); 
 		   message.setSubject("GameView Validation Code");
@@ -593,127 +601,127 @@ public class UserDBAO {
 		return id;
 	}
 
-	public boolean newFollowing(Long followerid, Long followedid) {
-		boolean status = false;
-		try {
-			String select = "select following_list from profile_table where user_id = ?";
-			getConnection();
-			PreparedStatement prepStmt1 = con.prepareStatement(select);
-			prepStmt1.setLong(1, followerid);
-			ResultSet rs = prepStmt1.executeQuery();
-			String followinglist = "";
-			if (rs.next()) {
-				followinglist = rs.getString("following_list");
-				if (followinglist == "") {
-					followinglist = String.valueOf(followedid);
-				} else {
-					followinglist = followinglist + "," + String.valueOf(followedid);
-				}
-				prepStmt1.close();
-			} else {
-				prepStmt1.close();
-				releaseConnection();
-				return status;
-			}
+//	public boolean newFollowing(Long followerid, Long followedid) {
+//		boolean status = false;
+//		try {
+//			String select = "select following_list from profile_table where user_id = ?";
+//			getConnection();
+//			PreparedStatement prepStmt1 = con.prepareStatement(select);
+//			prepStmt1.setLong(1, followerid);
+//			ResultSet rs = prepStmt1.executeQuery();
+//			String followinglist = "";
+//			if (rs.next()) {
+//				followinglist = rs.getString("following_list");
+//				if (followinglist == "") {
+//					followinglist = String.valueOf(followedid);
+//				} else {
+//					followinglist = followinglist + "," + String.valueOf(followedid);
+//				}
+//				prepStmt1.close();
+//			} else {
+//				prepStmt1.close();
+//				releaseConnection();
+//				return status;
+//			}
+//
+//			String update = "update profile_table " + "set following_list=? " + "where user_id=? ";
+//			PreparedStatement prepStmt2 = con.prepareStatement(update);
+//			prepStmt2.setString(1, followinglist);
+//			prepStmt2.setLong(2, followerid);
+//			int x = prepStmt2.executeUpdate();
+//			if (x == 1) {
+//				status = true;
+//			}
+//			prepStmt2.close();
+//			releaseConnection();
+//		} catch (SQLException ex) {
+//			releaseConnection();
+//			ex.printStackTrace();
+//		}
+//		return status;
+//	}
+//
+//	public boolean unfollow(Long followerid, Long followedid) {
+//		boolean status = false;
+//		try {
+//			String select = "select following_list from profile_table where user_id = ?";
+//			getConnection();
+//			PreparedStatement prepStmt1 = con.prepareStatement(select);
+//			prepStmt1.setLong(1, followerid);
+//			ResultSet rs = prepStmt1.executeQuery();
+//			String followinglist = "";
+//			if (rs.next()) {
+//				followinglist = rs.getString("following_list");
+//				prepStmt1.close();
+//			} else {
+//				prepStmt1.close();
+//				releaseConnection();
+//				return status;
+//			}
+//
+//			String update = "update profile_table " + "set following_list=? " + "where user_id=? ";
+//			PreparedStatement prepStmt2 = con.prepareStatement(update);
+//
+//			List<String> list = Arrays.asList(followinglist.split(","));
+//			list.remove(String.valueOf(followedid));
+//			followinglist = String.join(",", list);
+//
+//			prepStmt2.setString(1, followinglist);
+//			prepStmt2.setLong(2, followerid);
+//			int x = prepStmt2.executeUpdate();
+//			if (x == 1) {
+//				status = true;
+//			}
+//			prepStmt2.close();
+//			releaseConnection();
+//		} catch (SQLException ex) {
+//			releaseConnection();
+//			ex.printStackTrace();
+//		}
+//		return status;
+//	}
 
-			String update = "update profile_table " + "set following_list=? " + "where user_id=? ";
-			PreparedStatement prepStmt2 = con.prepareStatement(update);
-			prepStmt2.setString(1, followinglist);
-			prepStmt2.setLong(2, followerid);
-			int x = prepStmt2.executeUpdate();
-			if (x == 1) {
-				status = true;
-			}
-			prepStmt2.close();
-			releaseConnection();
-		} catch (SQLException ex) {
-			releaseConnection();
-			ex.printStackTrace();
-		}
-		return status;
-	}
+//	public boolean removeFans(Long followerid, Long followedid) {
+//		boolean status = false;
+//		try {
+//			String select = "select fans_list from profile_table where user_id = ?";
+//			getConnection();
+//			PreparedStatement prepStmt1 = con.prepareStatement(select);
+//			prepStmt1.setLong(1, followedid);
+//			ResultSet rs = prepStmt1.executeQuery();
+//			String fanslist = "";
+//			if (rs.next()) {
+//				fanslist = rs.getString("fans_list");
+//				prepStmt1.close();
+//			} else {
+//				prepStmt1.close();
+//				releaseConnection();
+//				return status;
+//			}
+//
+//			String update = "update profile_table " + "set fans_list=? " + "where user_id=? ";
+//			PreparedStatement prepStmt2 = con.prepareStatement(update);
+//
+//			List<String> list = Arrays.asList(fanslist.split(","));
+//			list.remove(String.valueOf(followerid));
+//			fanslist = String.join(",", list);
+//
+//			prepStmt2.setString(1, fanslist);
+//			prepStmt2.setLong(2, followedid);
+//			int x = prepStmt2.executeUpdate();
+//			if (x == 1) {
+//				status = true;
+//			}
+//			prepStmt2.close();
+//			releaseConnection();
+//		} catch (SQLException ex) {
+//			releaseConnection();
+//			ex.printStackTrace();
+//		}
+//		return status;
+//	}
 
-	public boolean unfollow(Long followerid, Long followedid) {
-		boolean status = false;
-		try {
-			String select = "select following_list from profile_table where user_id = ?";
-			getConnection();
-			PreparedStatement prepStmt1 = con.prepareStatement(select);
-			prepStmt1.setLong(1, followerid);
-			ResultSet rs = prepStmt1.executeQuery();
-			String followinglist = "";
-			if (rs.next()) {
-				followinglist = rs.getString("following_list");
-				prepStmt1.close();
-			} else {
-				prepStmt1.close();
-				releaseConnection();
-				return status;
-			}
-
-			String update = "update profile_table " + "set following_list=? " + "where user_id=? ";
-			PreparedStatement prepStmt2 = con.prepareStatement(update);
-
-			List<String> list = Arrays.asList(followinglist.split(","));
-			list.remove(String.valueOf(followedid));
-			followinglist = String.join(",", list);
-
-			prepStmt2.setString(1, followinglist);
-			prepStmt2.setLong(2, followerid);
-			int x = prepStmt2.executeUpdate();
-			if (x == 1) {
-				status = true;
-			}
-			prepStmt2.close();
-			releaseConnection();
-		} catch (SQLException ex) {
-			releaseConnection();
-			ex.printStackTrace();
-		}
-		return status;
-	}
-
-	public boolean removeFans(Long followerid, Long followedid) {
-		boolean status = false;
-		try {
-			String select = "select fans_list from profile_table where user_id = ?";
-			getConnection();
-			PreparedStatement prepStmt1 = con.prepareStatement(select);
-			prepStmt1.setLong(1, followedid);
-			ResultSet rs = prepStmt1.executeQuery();
-			String fanslist = "";
-			if (rs.next()) {
-				fanslist = rs.getString("fans_list");
-				prepStmt1.close();
-			} else {
-				prepStmt1.close();
-				releaseConnection();
-				return status;
-			}
-
-			String update = "update profile_table " + "set fans_list=? " + "where user_id=? ";
-			PreparedStatement prepStmt2 = con.prepareStatement(update);
-
-			List<String> list = Arrays.asList(fanslist.split(","));
-			list.remove(String.valueOf(followerid));
-			fanslist = String.join(",", list);
-
-			prepStmt2.setString(1, fanslist);
-			prepStmt2.setLong(2, followedid);
-			int x = prepStmt2.executeUpdate();
-			if (x == 1) {
-				status = true;
-			}
-			prepStmt2.close();
-			releaseConnection();
-		} catch (SQLException ex) {
-			releaseConnection();
-			ex.printStackTrace();
-		}
-		return status;
-	}
-
-	// ¼ÙÉèÊéÇ©idÊÇLong
+	// ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ç©idï¿½ï¿½Long
 
 	public boolean newBookmark(Long userid, Long id) {
 		boolean status = false;
@@ -727,11 +735,11 @@ public class UserDBAO {
 			if (rs.next()) {
 				bookmarklist = rs.getString("Bookmark_list");
 
-				if (bookmarklist == "[]") {
+				if (bookmarklist.equals("[]")) {
 					bookmarklist = "["+String.valueOf(id)+"]";
 				} else {
-					bookmarklist.replace("]",",");
-					bookmarklist = bookmarklist + "," + String.valueOf(id)+ "]";
+					bookmarklist=bookmarklist.replace("]",",");
+					bookmarklist = bookmarklist + String.valueOf(id)+ "]";
 				}
 
 				prepStmt1.close();
@@ -741,7 +749,7 @@ public class UserDBAO {
 				return status;
 			}
 
-			String update = "update profile_table " + "set following_list=? " + "where user_id=? ";
+			String update = "update profile_table " + "set bookmark_list=? " + "where user_id=? ";
 			PreparedStatement prepStmt2 = con.prepareStatement(update);
 			prepStmt2.setString(1, bookmarklist);
 			prepStmt2.setLong(2, userid);

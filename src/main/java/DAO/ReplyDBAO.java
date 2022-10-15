@@ -108,7 +108,8 @@ public class ReplyDBAO {
 			prepStmt.setLong(1, reply_id);
     		prepStmt.setLong(2, commentId);
     		prepStmt.setLong(3, userId);
-    		prepStmt.setDate(4, new Date(new java.util.Date().getTime()));
+//    		prepStmt.setDate(4, new Date(new java.util.Date().getTime()));
+    		prepStmt.setTimestamp(4, new java.sql.Timestamp(new java.util.Date().getTime()));
     		prepStmt.setString(5, content);
     		
     		int x = prepStmt.executeUpdate();

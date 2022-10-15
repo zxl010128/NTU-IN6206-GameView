@@ -1,7 +1,6 @@
 package servlets;
 
 import java.io.IOException;
-
 import java.io.PrintWriter;
 
 import javax.servlet.ServletException;
@@ -10,22 +9,21 @@ import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
 
-import DAO.GameDBAO;
-import entity.Game;
 import net.sf.json.JSONObject;
 
 /**
- * Servlet implementation class GamePage
+ * Servlet implementation class Logout
  */
-@WebServlet("/GamePage")
-public class GamePage extends HttpServlet {
+@WebServlet("/Logout")
+public class Logout extends HttpServlet {
 	private static final long serialVersionUID = 1L;
        
     /**
      * @see HttpServlet#HttpServlet()
      */
-    public GamePage() {
+    public Logout() {
         super();
         // TODO Auto-generated constructor stub
     }
@@ -35,37 +33,13 @@ public class GamePage extends HttpServlet {
 	 */
 	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 		// TODO Auto-generated method stub
-		PrintWriter out = response.getWriter();
-		Long game_id = Long.parseLong(request.getParameter("game_id"));
-		try {
-			GameDBAO gamedbao = new GameDBAO();
-			Game game = gamedbao.findById(game_id);
-			if (game == null){
-				JSONObject json = new JSONObject();
-				json.put("data", "");
-				json.put("message", "fail");
-				json.put("status_code", 400);
-				out.write(json.toString());
-				out.flush();
-				out.close();
-				return;
-			}
-			else{
-				JSONObject datajson = JSONObject.fromObject(game);
-				JSONObject json = new JSONObject();
-				json.put("data", datajson);
-				json.put("message", "success");
-				json.put("status_code", 200);
-				out.write(json.toString());
-				out.flush();
-				out.close();
-				return;
-			}
-		} catch (Exception e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-		}
+		Cookie cookie = new Cookie("token","");
+		cookie.setMaxAge(0);
+		cookie.setPath("/");
+		response.addCookie(cookie);
+		
+		
+	}
 
 	/**
 	 * @see HttpServlet#doPost(HttpServletRequest request, HttpServletResponse response)
