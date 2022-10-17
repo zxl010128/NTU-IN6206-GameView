@@ -1,6 +1,5 @@
 package entity;
 
-import java.util.Date;
 
 public class User {
 	
@@ -129,10 +128,25 @@ public class User {
 		this.reset_code = reset_code;
 	}
 	
-	private Date createTime;
+	private String createTime;
 	
+	public String getcreateTime() {
+		return createTime;
+	}
 	
-	public User(Long id, String userName, String facepic, String phone, String email, String dob, int gender) {
+	public String like_list;
+	
+	public String getlikelist() {
+		return like_list;
+	}
+	
+	public String post_list;
+	
+	public String getpostlist() {
+		return post_list;
+	}
+	
+	public User(Long id, String userName, String facepic, String phone, String email, String dob, int gender,String createTime) {
 		this.id = id;
 		this.userName = userName;
 		this.facepic = facepic;
@@ -140,6 +154,7 @@ public class User {
 		this.gender = gender;
 		this.phone = phone;
 		this.email = email;	
+		this.createTime = createTime;
 	}
 	
 	public User() {

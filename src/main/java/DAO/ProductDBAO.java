@@ -6,6 +6,7 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.Base64;
 import java.util.List;
 
 import javax.mail.*;
@@ -14,6 +15,7 @@ import javax.mail.internet.MimeMessage;
 import java.util.Properties;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
+import java.security.SecureRandom;
 
 import entity.Product;
 
@@ -154,33 +156,33 @@ public class ProductDBAO {
     	return status;
     }
     
-    public String findKeyById(Long id) {
-    	String key="";
-    	try {
-			String selectStatement = "select product_key " + "from product_table where product_id = ?";
-			getConnection();
-			PreparedStatement prepStmt = con.prepareStatement(selectStatement);
-			prepStmt.setLong(1, id);
-			ResultSet rs = prepStmt.executeQuery();
-			if (rs.next()) {
-				key = rs.getString("product_key");
-				prepStmt.close();
-				releaseConnection();
-
-			} else {
-				prepStmt.close();
-				releaseConnection();
-
-			}
-
-		} catch (SQLException ex) {
-			releaseConnection();
-			ex.printStackTrace();
-		}
-    	return key;
-    }
+//    public String findKeyById(Long id) {
+//    	String key="";
+//    	try {
+//			String selectStatement = "select product_key " + "from product_table where product_id = ?";
+//			getConnection();
+//			PreparedStatement prepStmt = con.prepareStatement(selectStatement);
+//			prepStmt.setLong(1, id);
+//			ResultSet rs = prepStmt.executeQuery();
+//			if (rs.next()) {
+//				key = rs.getString("product_key");
+//				prepStmt.close();
+//				releaseConnection();
+//
+//			} else {
+//				prepStmt.close();
+//				releaseConnection();
+//
+//			}
+//
+//		} catch (SQLException ex) {
+//			releaseConnection();
+//			ex.printStackTrace();
+//		}
+//    	return key;
+//    }
     
-    public boolean sendProduct(String email, String productkey) {
+    public boolean sendProduct(String email) {
     	boolean status = false;
     	try { 
     	   String adminEmail = "w627661598@sina.cn"; 
@@ -208,6 +210,13 @@ public class ProductDBAO {
 		   InternetAddress toAddress = new InternetAddress(email); 
 		   message.setRecipient(Message.RecipientType.TO,toAddress); 
 		   message.setSubject("GameView Product Key");
+		   
+		   SecureRandom secureRandom = new SecureRandom();
+		   Base64.Encoder base64Encoder = Base64.getUrlEncoder();
+		   byte[] randomBytes = new byte[24];
+		   secureRandom.nextBytes(randomBytes);
+		   String productkey = base64Encoder.encodeToString(randomBytes);
+		   
 		   message.setContent(productkey, "text/html;charset=UTF-8");
 		   Transport.send(message); status = true; 
 		   }catch (Exception e){

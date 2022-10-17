@@ -12,6 +12,7 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Base64;
@@ -146,7 +147,7 @@ public class UserDBAO {
 			String dob, int gender) {
 		boolean status = false;
 		try {
-			String selectStatement = "insert into profile_table (user_id,username,password,facepicture,phonenumber,email,dob,gender,coin,following_list,fans_list,bookmark_list,token,reset_code,createtime) values (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?);";
+			String selectStatement = "insert into profile_table (user_id,username,password,facepicture,phonenumber,email,dob,gender,coin,following_list,fans_list,bookmark_list,token,reset_code,createtime,like_list,post_list) values (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?);";
 			getConnection();
 			PreparedStatement prepStmt = con.prepareStatement(selectStatement);
 
@@ -182,6 +183,7 @@ public class UserDBAO {
 
 			prepStmt.setString(14, "");
 			prepStmt.setTimestamp(15, new java.sql.Timestamp(new java.util.Date().getTime()));
+			prepStmt.setString(16, "[]");
 
 			int x = prepStmt.executeUpdate();
 
@@ -291,13 +293,14 @@ public class UserDBAO {
 	 public User findByUserid(Long user_id) { 
 		 User ruser= new User(); 
 		 try { 
-			 String selectStatement = "select user_id,username,facepicture,phonenumber,email,dob,gender " + "from profile_table where user_id = ?"; 
+			 String selectStatement = "select user_id,username,facepicture,phonenumber,email,dob,gender,createtime " + "from profile_table where user_id = ?"; 
 			 getConnection(); 
 			 PreparedStatement prepStmt = con.prepareStatement(selectStatement); 
 			 prepStmt.setLong(1,user_id); 
 			 ResultSet rs = prepStmt.executeQuery(); 
 			 if (rs.next()) { 
-				 User user = new User(rs.getLong("user_id"), rs.getString("username"), rs.getString("facepicture"), rs.getString("phonenumber"), rs.getString("email"),rs.getString("dob"), rs.getInt("gender")); 
+				 String timeStamp = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(rs.getTimestamp("createtime"));
+				 User user = new User(rs.getLong("user_id"), rs.getString("username"), rs.getString("facepicture"), rs.getString("phonenumber"), rs.getString("email"),rs.getString("dob"), rs.getInt("gender"),timeStamp); 
 				 ruser = user;
 				 prepStmt.close(); 
 				 releaseConnection();
@@ -752,6 +755,49 @@ public class UserDBAO {
 			String update = "update profile_table " + "set bookmark_list=? " + "where user_id=? ";
 			PreparedStatement prepStmt2 = con.prepareStatement(update);
 			prepStmt2.setString(1, bookmarklist);
+			prepStmt2.setLong(2, userid);
+			int x = prepStmt2.executeUpdate();
+			if (x == 1) {
+				status = true;
+			}
+			prepStmt2.close();
+			releaseConnection();
+		} catch (SQLException ex) {
+			releaseConnection();
+			ex.printStackTrace();
+		}
+		return status;
+	}
+	
+	public boolean newLike(Long userid, Long id) {
+		boolean status = false;
+		try {
+			String select = "select like_list from profile_table where user_id = ?";
+			getConnection();
+			PreparedStatement prepStmt1 = con.prepareStatement(select);
+			prepStmt1.setLong(1, userid);
+			ResultSet rs = prepStmt1.executeQuery();
+			String likelist = "";
+			if (rs.next()) {
+				likelist = rs.getString("like_list");
+
+				if (likelist.equals("[]")) {
+					likelist = "["+String.valueOf(id)+"]";
+				} else {
+					likelist=likelist.replace("]",",");
+					likelist = likelist + String.valueOf(id)+ "]";
+				}
+
+				prepStmt1.close();
+			} else {
+				prepStmt1.close();
+				releaseConnection();
+				return status;
+			}
+
+			String update = "update profile_table " + "set like_list=? " + "where user_id=? ";
+			PreparedStatement prepStmt2 = con.prepareStatement(update);
+			prepStmt2.setString(1, likelist);
 			prepStmt2.setLong(2, userid);
 			int x = prepStmt2.executeUpdate();
 			if (x == 1) {

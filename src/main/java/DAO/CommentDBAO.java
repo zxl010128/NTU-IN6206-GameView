@@ -1,11 +1,10 @@
 package DAO;
 
 import java.sql.*;
-
-
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.List;
-
+import DAO.UserDBAO;
 import entity.Comment;
 import entity.Game;
 
@@ -84,7 +83,9 @@ public class CommentDBAO {
     		ResultSet rs = prepStmt.executeQuery();	
     		
     		while(rs.next()) {
-    			Comment cmt = new Comment(rs.getLong("post_id"), rs.getInt("totallike"), rs.getInt("totaldislike"), rs.getInt("totallove"), rs.getString("content"), rs.getDate("createtime"), rs.getInt("is_get_coin"), rs.getLong("user_id"), rs.getLong("game_id"));
+    			String timeStamp = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(rs.getTimestamp("createtime"));
+    			Comment cmt = new Comment(rs.getLong("post_id"), rs.getInt("totallike"), rs.getInt("totaldislike"), rs.getInt("totallove"), rs.getString("content"), timeStamp, rs.getInt("is_get_coin"), rs.getLong("user_id"), rs.getLong("game_id"));
+//    			Comment cmt = new Comment(rs.getLong("post_id"), rs.getInt("totallike"), rs.getInt("totaldislike"), rs.getInt("totallove"), rs.getString("content"), rs.getDate("createtime"), rs.getInt("is_get_coin"), rs.getLong("user_id"), rs.getLong("game_id"));
     			comments.add(cmt);
     		}
     		prepStmt.close();
@@ -105,8 +106,10 @@ public class CommentDBAO {
 		     prepStmt.setLong(1, id);
 		     ResultSet rs = prepStmt.executeQuery();
 		     while(rs.next()) {
-		    	 Comment cmt = new Comment(rs.getLong("post_id"), rs.getInt("totallike"), rs.getInt("totaldislike"), rs.getInt("totallove"), rs.getString("content"), rs.getDate("createtime"));
-		    	   comment = cmt;
+		    	 String timeStamp = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(rs.getTimestamp("createtime"));
+//		    	 Comment cmt = new Comment(rs.getLong("post_id"), rs.getInt("totallike"), rs.getInt("totaldislike"), rs.getInt("totallove"), rs.getString("content"), rs.getDate("createtime"));
+		    	 Comment cmt = new Comment(rs.getLong("post_id"), rs.getInt("totallike"), rs.getInt("totaldislike"), rs.getInt("totallove"), rs.getString("content"), timeStamp);
+		    	 comment = cmt;
 		     }
 		     prepStmt.close();
 		     
@@ -141,7 +144,8 @@ public class CommentDBAO {
     		prepStmt.setLong(2, gameId);
     		prepStmt.setLong(3, userId);
     		prepStmt.setString(4, content);
-    		prepStmt.setDate(5, new Date(new java.util.Date().getTime()));
+//    		prepStmt.setDate(5, new Date(new java.util.Date().getTime()));
+    		prepStmt.setTimestamp(5, new java.sql.Timestamp(new java.util.Date().getTime()));
     		
     		int x = prepStmt.executeUpdate();
             if (x == 1) {
@@ -161,17 +165,19 @@ public class CommentDBAO {
     public boolean addLike(Long commentId) {
     	boolean status = false;
     	try {
-    		String select = "select totallike from comment_table where post_id = ?";
+    		String select = "select totallike,is_get_coin from comment_table where post_id = ?";
 			getConnection();
 			PreparedStatement prepStmt = con.prepareStatement(select);
 			prepStmt.setLong(1, commentId);
 			ResultSet rs = prepStmt.executeQuery();
 			int totalLike = 0;
+			int isgetcoin = 0;
 			if (rs.next()) {
 				totalLike = rs.getInt("totallike") + 1;
+				isgetcoin = rs.getInt("is_get_coin");
 			}
 			prepStmt.close();
-			if(totalLike == 1000) {
+			if(totalLike == 1000 & isgetcoin== 0) {
 				String selectStatement = "update comment_table " + "set totallike=?,is_get_coin=? " + "where post_id=? ";
 				PreparedStatement prepStmt0 = con.prepareStatement(selectStatement);
 				prepStmt0.setInt(1, totalLike);
@@ -324,4 +330,70 @@ public class CommentDBAO {
     	}
     	return status;
     }
+    
+    public List<Game> rankByPosts(){
+    	List<Game> games = new ArrayList<Game>();
+    	try {
+    		String selectStatement = "select game_table.gamename,game_table.gamepicture,(select COUNT(post_id) from comment_table where comment_table.game_id=game_table.game_id) posts from game_table order by posts desc limit 10";
+    		getConnection();
+    		PreparedStatement prepStmt = con.prepareStatement(selectStatement);
+    		ResultSet rs = prepStmt.executeQuery();	
+   
+    		while(rs.next()) {
+    			Game gm = new Game(rs.getString("gamename"),rs.getString("gamepicture"),rs.getInt("posts"));
+    			games.add(gm);
+    		}
+    		prepStmt.close();
+    	}catch(SQLException ex) {
+    		releaseConnection();
+            ex.printStackTrace();
+    	}
+    	releaseConnection();
+    	return games;
+    }
+    
+    public List<Comment> rankByLikes(){
+    	List<Comment> comments = new ArrayList<Comment>();
+    	try {
+    		String selectStatement = "select content,totallike,createtime from comment_table order by totallike desc limit 10";
+    		getConnection();
+    		PreparedStatement prepStmt = con.prepareStatement(selectStatement);
+    		ResultSet rs = prepStmt.executeQuery();	
+   
+    		while(rs.next()) {
+    			String timeStamp = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(rs.getTimestamp("createtime"));
+    			Comment comment = new Comment(rs.getString("content"), rs.getInt("totallike"), timeStamp);
+    			comments.add(comment);
+    		}
+    		prepStmt.close();
+    	}catch(SQLException ex) {
+    		releaseConnection();
+            ex.printStackTrace();
+    	}
+    	releaseConnection();
+    	return comments;
+    }
+    
+    public int isGetCoin(Long post_id) {
+    	int isgetcoin=0;
+    	try {
+    		String select = "select is_get_coin from comment_table where post_id = ?";
+			getConnection();
+			PreparedStatement prepStmt = con.prepareStatement(select);
+			prepStmt.setLong(1, post_id);
+			ResultSet rs = prepStmt.executeQuery();
+			int totalLove = 0;
+			if (rs.next()) {
+				isgetcoin=rs.getInt("is_get_coin");
+			}
+			prepStmt.close();
+            releaseConnection();
+    		
+    	} catch(SQLException ex) {
+    		releaseConnection();
+            ex.printStackTrace();
+    	}
+    	return isgetcoin;
+    }
+    
 }

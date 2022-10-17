@@ -12,20 +12,20 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import DAO.UserDBAO;
-import DAO.ProductDBAO;
+import DAO.CommentDBAO;
 import net.sf.json.JSONObject;
 
 /**
- * Servlet implementation class Redeem
+ * Servlet implementation class AddLike
  */
-@WebServlet("/Redeem")
-public class Redeem extends HttpServlet {
+@WebServlet("/AddLike")
+public class AddLike extends HttpServlet {
 	private static final long serialVersionUID = 1L;
        
     /**
      * @see HttpServlet#HttpServlet()
      */
-    public Redeem() {
+    public AddLike() {
         super();
         // TODO Auto-generated constructor stub
     }
@@ -35,13 +35,11 @@ public class Redeem extends HttpServlet {
 	 */
 	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 		// TODO Auto-generated method stub
-		
-
-		Long product_id = Long.parseLong(request.getParameter("product_id")); 
-
-		try { 
+		Long post_id = Long.parseLong(request.getParameter("post_id"));
+		try {
 			PrintWriter out = response.getWriter();
 			UserDBAO userdbao = new UserDBAO();
+			CommentDBAO commentdbao = new CommentDBAO();
 			Cookie[] cookie = request.getCookies();
 			Long id = (long)0;
 			if(cookie == null) {
@@ -69,27 +67,9 @@ public class Redeem extends HttpServlet {
 					}
 				}
 			}
-			ProductDBAO productdbao = new ProductDBAO();
-			boolean x = productdbao.redeemProduct(product_id,id);
-			System.out.println(x);
-			if (x == false) { 
-				JSONObject jsonObject = new JSONObject();
-				jsonObject.put("data", "");
-				jsonObject.put("message", "fail");
-				jsonObject.put("status_code", 403); 
-				out.write(jsonObject.toString()); 
-				out.flush(); 
-				out.close();
-				return;
-			} 
 			
-			//find email by id
-			String email = userdbao.findEmailById(id);
-			
-			// send product key
-			boolean y = productdbao.sendProduct(email);
-			
-			if(y == false) {
+			boolean x = userdbao.newLike(id, post_id);
+			if(x == false) {
 				JSONObject jsonObject = new JSONObject();
 				jsonObject.put("data", "");
 				jsonObject.put("message", "fail");
@@ -100,6 +80,32 @@ public class Redeem extends HttpServlet {
 				return;
 			}
 			else {
+			boolean y = commentdbao.addLike(post_id);
+			if (y == false) {
+				JSONObject jsonObject = new JSONObject();
+				jsonObject.put("data", "");
+				jsonObject.put("message", "fail");
+				jsonObject.put("status_code", 500); 
+				out.write(jsonObject.toString()); 
+				out.flush(); 
+				out.close();
+				return;
+			}
+			else {
+				int isgetcoin = commentdbao.isGetCoin(post_id);
+				if(isgetcoin == 0) {
+					boolean z = userdbao.addCoin(id, 50);
+					if(z == false) {
+						JSONObject jsonObject = new JSONObject();
+						jsonObject.put("data", "");
+						jsonObject.put("message", "fail");
+						jsonObject.put("status_code", 500); 
+						out.write(jsonObject.toString()); 
+						out.flush(); 
+						out.close();
+						return;
+					}
+				}
 				JSONObject jsonObject=new JSONObject();
 				jsonObject.put("data", "");
 				jsonObject.put("status_code", 200); 
@@ -107,11 +113,14 @@ public class Redeem extends HttpServlet {
 				out.write(jsonObject.toString()); 
 				out.flush();
 				out.close();
-				return; }
-		} catch (Exception e) { 
-			// TODO Auto-generated catch block 
-			e.printStackTrace(); 
+				return;  
 			}
+			}
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		
 		
 		}
 

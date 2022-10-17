@@ -1,5 +1,6 @@
 package entity;
 
+import java.sql.Timestamp;
 import java.util.Date;
 
 public class Comment {
@@ -14,7 +15,7 @@ public class Comment {
 	
 	private String content; // comment content
 	
-	private Date createTime; // comment post time
+	private String createTime; // comment post time
 	
 	private int isGetCoin; // if get coin
 	
@@ -26,7 +27,7 @@ public class Comment {
 	
 	private Game game;
 	
-	public Comment(Long id, int totalLike, int totalDislike, int totalLove, String content, Date createTime, int isGetCoin, Long userId, Long gameId) {
+	public Comment(Long id, int totalLike, int totalDislike, int totalLove, String content, String createTime, int isGetCoin, Long userId, Long gameId) {
 		this.id = id;
 		this.totalLike = totalLike;
 		this.totalDislike = totalDislike;
@@ -38,11 +39,19 @@ public class Comment {
 		this.gameId = gameId;
 	}
 	
-	public Comment(Long id, int totalLike, int totalDislike, int totalLove, String content, Date createTime) {
+	public Comment(Long id, int totalLike, int totalDislike, int totalLove, String content, String createTime) {
 		this.id = id;
 		this.totalLike = totalLike;
 		this.totalDislike = totalDislike;
 		this.totalLove = totalLove;
+		this.content = content;
+		this.createTime = createTime;
+	}
+	
+	public Comment(String content,int totalLike,String createTime) {
+		
+		this.totalLike = totalLike;
+		
 		this.content = content;
 		this.createTime = createTime;
 	}
@@ -59,11 +68,11 @@ public class Comment {
 		this.id = id;
 	}
 	
-	public Date getCreateTime() {
+	public String getCreateTime() {
 		return createTime;
 	}
 	
-	public void setCreateTime(Date createTIme) {
+	public void setCreateTime(String createTime) {
 		this.createTime = createTime;
 	}
 	

@@ -80,6 +80,18 @@ public class NewReply extends HttpServlet {
 				out.close();
 				return;
 			}
+			else {
+			boolean y = userdbao.addCoin(id, 1);
+			if(y == false) {
+				JSONObject jsonObject = new JSONObject();
+				jsonObject.put("data", "");
+				jsonObject.put("message", "fail");
+				jsonObject.put("status_code", 500); 
+				out.write(jsonObject.toString()); 
+				out.flush(); 
+				out.close();
+				return;
+			}
 			JSONObject jsonObject=new JSONObject();
 			jsonObject.put("data", "");
 			jsonObject.put("status_code", 200); 
@@ -88,7 +100,7 @@ public class NewReply extends HttpServlet {
 			out.flush();
 			out.close();
 			return;  
-			
+			}
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();

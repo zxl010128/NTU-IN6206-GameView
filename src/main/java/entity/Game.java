@@ -16,6 +16,8 @@ public class Game {
 	
 	private int rateNum; // number of users rated
 	
+	private int posts; // number of posts
+	
 	public Game(Long id, String gameName, String gamePicture, String category, String introduction, int score, int rateNum) {
 		this.id = id;
 		this.gameName = gameName;
@@ -40,8 +42,18 @@ public class Game {
 		this.gamePicture = gamepicture;
 	}
 	
+	public Game(String gameName, String gamepicture, int posts) {
+		this.gameName = gameName;
+		this.gamePicture = gamepicture;
+		this.posts = posts;
+	}
+	
 	public Game(){
 		
+	}
+	
+	public int getPosts() {
+		return posts;
 	}
 	
 	public Long getId() {

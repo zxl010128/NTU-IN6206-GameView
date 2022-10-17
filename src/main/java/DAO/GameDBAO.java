@@ -117,7 +117,7 @@ public class GameDBAO {
     public List<Game> rankByScore(){
     	List<Game> games = new ArrayList<Game>();
     	try {
-    		String selectStatement = "select gamename,totalscore,gamepicture from game_table order by totalscore limit 10";
+    		String selectStatement = "select gamename,totalscore,gamepicture from game_table order by totalscore desc limit 10";
     		getConnection();
     		PreparedStatement prepStmt = con.prepareStatement(selectStatement);
     		ResultSet rs = prepStmt.executeQuery();	
