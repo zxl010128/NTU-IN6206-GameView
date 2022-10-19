@@ -43,9 +43,28 @@ public class ChangeProfile extends HttpServlet {
 		String password = request.getParameter("password"); 
 		String dob = request.getParameter("dob"); 
 		int gender = Integer.parseInt(request.getParameter("gender")); 
-		
 		try { 
 			PrintWriter out = response.getWriter();
+			if(phonenumber.length()!=8) {
+				JSONObject jsonObject = new JSONObject();
+				jsonObject.put("data", "");
+				jsonObject.put("message", "wrong number format");
+				jsonObject.put("status_code", 400);
+				out.write(jsonObject.toString()); 
+				out.flush(); 
+				out.close();
+				return;
+			}
+			if(password.length()<6||password.length()>20) {
+				JSONObject jsonObject = new JSONObject();
+				jsonObject.put("data", "");
+				jsonObject.put("message", "invalid length of password");
+				jsonObject.put("status_code", 400);
+				out.write(jsonObject.toString()); 
+				out.flush(); 
+				out.close();
+				return;
+			}
 			UserDBAO userdbao = new UserDBAO();
 			Cookie[] cookie = request.getCookies();
 			Long id = (long)0;

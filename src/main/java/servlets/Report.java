@@ -13,16 +13,16 @@ import DAO.UserDBAO;
 import net.sf.json.JSONObject;
 
 /**
- * Servlet implementation class Validation
+ * Servlet implementation class Report
  */
-@WebServlet("/Validation")
-public class Validation extends HttpServlet {
+@WebServlet("/Report")
+public class Report extends HttpServlet {
 	private static final long serialVersionUID = 1L;
        
     /**
      * @see HttpServlet#HttpServlet()
      */
-    public Validation() {
+    public Report() {
         super();
         // TODO Auto-generated constructor stub
     }
@@ -33,53 +33,28 @@ public class Validation extends HttpServlet {
 	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 		// TODO Auto-generated method stub
 		PrintWriter out = response.getWriter(); 
-		String resetcode = request.getParameter("resetcode"); 
-		String email = request.getParameter("email");
-		String newPwd = request.getParameter("newpassword");
+		String content = request.getParameter("content"); 
 		try { 
-			if(newPwd.length()<6||newPwd.length()>20) {
-				JSONObject jsonObject = new JSONObject();
-				jsonObject.put("data", "");
-				jsonObject.put("message", "invalid length of password");
-				jsonObject.put("status_code", 400);
-				out.write(jsonObject.toString()); 
-				out.flush(); 
-				out.close();
-				return;
-			}
 		UserDBAO userdbao = new UserDBAO(); 
-		boolean x  = userdbao.validationCode(email, resetcode); 
-		if (x == false) { 
+		boolean x = userdbao.report(content);
+		if(x == false) {
 			JSONObject json = new JSONObject();
 			json.put("data", "");
 			json.put("message", "fail");
-			json.put("status_code", 400);
+			json.put("status_code", 500);
 			out.write(json.toString());
 			out.flush();
 			out.close();
 			return;
-		} 
-		boolean y = userdbao.resetPassword(email, newPwd);
-		if(y == false) {
-			JSONObject jsonObject = new JSONObject();
-			jsonObject.put("data", "");
-			jsonObject.put("message", "fail");
-			jsonObject.put("status_code", 500); 
-			out.write(jsonObject.toString()); 
-			out.flush(); 
-			out.close();
-			return;
 		}
-		else{
-			JSONObject jsonObject=new JSONObject();
-			jsonObject.put("data", "");
-			jsonObject.put("status_code", 200); 
-			jsonObject.put("message", "success"); 
-			out.write(jsonObject.toString()); 
-			out.flush();
-			out.close();
-			return;  
-		}
+		JSONObject jsonObject=new JSONObject();
+		jsonObject.put("data", "");
+		jsonObject.put("status_code", 200); 
+		jsonObject.put("message", "success"); 
+		out.write(jsonObject.toString()); 
+		out.flush();
+		out.close();
+		return; 
 		} catch (Exception e) { 
 		// TODO Auto-generated catch block 
 		e.printStackTrace(); 

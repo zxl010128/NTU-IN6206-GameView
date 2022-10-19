@@ -155,5 +155,26 @@ public class GameDBAO {
     	releaseConnection();
     	return games;
     }
+    
+    public int countGames() {
+    	int games = -1;
+    	try {
+    		String selectStatement = "select COUNT(game_id) as games from game_table";
+    		getConnection();
+    		PreparedStatement prepStmt = con.prepareStatement(selectStatement);
+    		ResultSet rs = prepStmt.executeQuery();	
+    		
+    		if(rs.next()) {
+    			games = rs.getInt("games");
+    		}
+    		prepStmt.close();
+    	}catch(SQLException ex) {
+    		releaseConnection();
+            ex.printStackTrace();
+    	}
+    	releaseConnection();
+    	return games;
+    }
+    
 }
     	

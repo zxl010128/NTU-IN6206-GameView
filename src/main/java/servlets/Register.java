@@ -65,7 +65,6 @@ public class Register extends HttpServlet {
 				out.close();
 				return;
 			} 
-			
 			boolean username_exists = userdbao.checkUsernameExists(username); 
 			if (username_exists == true) { 
 				JSONObject jsonObject = new JSONObject();
@@ -77,20 +76,66 @@ public class Register extends HttpServlet {
 				out.close();
 				return;
 			} 
-//			//generate validation code and send email
-//			boolean x = userdbao.sendResetCode(email); 
-//			if (x == false) { 
-//				JSONObject jsonObject=new JSONObject() ; 
-//				jsonObject.put("message", "Failed to Send Email! "); 
-//				out.write(jsonObject.toString()); 
-//				out.flush(); 
-//				return; 
-//			} 
-//
-//			//validation 
-//			boolean y = userdbao.validationCode();
- 
-
+			if(email.contains("@")==false) {
+				JSONObject jsonObject = new JSONObject();
+				jsonObject.put("data", "");
+				jsonObject.put("message", "wrong email format");
+				jsonObject.put("status_code", 400);
+				out.write(jsonObject.toString()); 
+				out.flush(); 
+				out.close();
+				return;
+			}
+			if(email.length()>40) {
+				JSONObject jsonObject = new JSONObject();
+				jsonObject.put("data", "");
+				jsonObject.put("message", "too long email");
+				jsonObject.put("status_code", 400);
+				out.write(jsonObject.toString()); 
+				out.flush(); 
+				out.close();
+				return;
+			}
+			if(phonenumber.length()!=8) {
+				JSONObject jsonObject = new JSONObject();
+				jsonObject.put("data", "");
+				jsonObject.put("message", "wrong number format");
+				jsonObject.put("status_code", 400);
+				out.write(jsonObject.toString()); 
+				out.flush(); 
+				out.close();
+				return;
+			}
+			if(password.length()<6||password.length()>20) {
+				JSONObject jsonObject = new JSONObject();
+				jsonObject.put("data", "");
+				jsonObject.put("message", "invalid length of password");
+				jsonObject.put("status_code", 400);
+				out.write(jsonObject.toString()); 
+				out.flush(); 
+				out.close();
+				return;
+			}
+			if(username.matches("^[a-zA-Z0-9]+$")==false) {
+				JSONObject jsonObject = new JSONObject();
+				jsonObject.put("data", "");
+				jsonObject.put("message", "invalid username");
+				jsonObject.put("status_code", 400);
+				out.write(jsonObject.toString()); 
+				out.flush(); 
+				out.close();
+				return;
+			}
+			if(username.length()>20) {
+				JSONObject jsonObject = new JSONObject();
+				jsonObject.put("data", "");
+				jsonObject.put("message", "too long username");
+				jsonObject.put("status_code", 400);
+				out.write(jsonObject.toString()); 
+				out.flush(); 
+				out.close();
+				return;
+			}
 			boolean y = userdbao.register(username,password,phonenumber,email,dob,gender); 
 			if (y == true) { 
 				JSONObject jsonObject = new JSONObject();

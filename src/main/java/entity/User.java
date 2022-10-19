@@ -90,17 +90,17 @@ public class User {
 	}
 	
 	
-	private String following_list;
-	
-	public String getfollowing_list() {
-		return following_list;
-	}
-	
-	private String fans_list;
-	
-	public String getfans_list() {
-		return fans_list;
-	}
+//	private String following_list;
+//	
+//	public String getfollowing_list() {
+//		return following_list;
+//	}
+//	
+//	private String fans_list;
+//	
+//	public String getfans_list() {
+//		return fans_list;
+//	}
 	
 	private String bookmark_list;
 	
@@ -146,7 +146,7 @@ public class User {
 		return post_list;
 	}
 	
-	public User(Long id, String userName, String facepic, String phone, String email, String dob, int gender,String createTime) {
+	public User(Long id, String userName, String facepic, String phone, String email, String dob, int gender,String createTime,String bookmark_list,String like_list,String post_list) {
 		this.id = id;
 		this.userName = userName;
 		this.facepic = facepic;
@@ -155,6 +155,9 @@ public class User {
 		this.phone = phone;
 		this.email = email;	
 		this.createTime = createTime;
+		this.bookmark_list=bookmark_list;
+		this.like_list=like_list;
+		this.post_list=post_list;
 	}
 	
 	public User() {

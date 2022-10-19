@@ -147,7 +147,7 @@ public class UserDBAO {
 			String dob, int gender) {
 		boolean status = false;
 		try {
-			String selectStatement = "insert into profile_table (user_id,username,password,facepicture,phonenumber,email,dob,gender,coin,following_list,fans_list,bookmark_list,token,reset_code,createtime,like_list,post_list) values (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?);";
+			String selectStatement = "insert into profile_table (user_id,username,password,facepicture,phonenumber,email,dob,gender,coin,bookmark_list,token,reset_code,createtime,like_list,post_list) values (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?);";
 			getConnection();
 			PreparedStatement prepStmt = con.prepareStatement(selectStatement);
 
@@ -174,16 +174,17 @@ public class UserDBAO {
 			prepStmt.setString(7, dob);
 			prepStmt.setInt(8, gender);
 			prepStmt.setInt(9, 0);
+//			prepStmt.setString(10, "[]");
+//			prepStmt.setString(11, "[]");
 			prepStmt.setString(10, "[]");
-			prepStmt.setString(11, "[]");
-			prepStmt.setString(12, "[]");
 
 			// generate token
-			prepStmt.setString(13, "");
+			prepStmt.setString(11, "");
 
-			prepStmt.setString(14, "");
-			prepStmt.setTimestamp(15, new java.sql.Timestamp(new java.util.Date().getTime()));
-			prepStmt.setString(16, "[]");
+			prepStmt.setString(12, "");
+			prepStmt.setTimestamp(13, new java.sql.Timestamp(new java.util.Date().getTime()));
+			prepStmt.setString(14, "[]");
+			prepStmt.setString(15, "[]");
 
 			int x = prepStmt.executeUpdate();
 
@@ -293,14 +294,14 @@ public class UserDBAO {
 	 public User findByUserid(Long user_id) { 
 		 User ruser= new User(); 
 		 try { 
-			 String selectStatement = "select user_id,username,facepicture,phonenumber,email,dob,gender,createtime " + "from profile_table where user_id = ?"; 
+			 String selectStatement = "select user_id,username,facepicture,phonenumber,email,dob,gender,createtime,bookmark_list,like_list,post_list " + "from profile_table where user_id = ?"; 
 			 getConnection(); 
 			 PreparedStatement prepStmt = con.prepareStatement(selectStatement); 
 			 prepStmt.setLong(1,user_id); 
 			 ResultSet rs = prepStmt.executeQuery(); 
 			 if (rs.next()) { 
 				 String timeStamp = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(rs.getTimestamp("createtime"));
-				 User user = new User(rs.getLong("user_id"), rs.getString("username"), rs.getString("facepicture"), rs.getString("phonenumber"), rs.getString("email"),rs.getString("dob"), rs.getInt("gender"),timeStamp); 
+				 User user = new User(rs.getLong("user_id"), rs.getString("username"), rs.getString("facepicture"), rs.getString("phonenumber"), rs.getString("email"),rs.getString("dob"), rs.getInt("gender"),timeStamp,rs.getString("bookmark_list"),rs.getString("like_list"),rs.getString("post_list")); 
 				 ruser = user;
 				 prepStmt.close(); 
 				 releaseConnection();
@@ -530,6 +531,7 @@ public class UserDBAO {
 		boolean status = false;
 		try {
 			String update = "update profile_table " + "set password=? " + "where email=? ";
+			getConnection();
 			PreparedStatement prepStmt = con.prepareStatement(update);
 			newPwd = getMD5(newPwd);
 			prepStmt.setString(1, newPwd);
@@ -582,6 +584,26 @@ public class UserDBAO {
 		}
 
 		return result;
+	}
+	
+	public boolean clearToken(Long id) {
+		boolean status = false;
+		try {
+		String update = "update profile_table " + "set token=NULL " + "where user_id=? ";
+		getConnection();
+		PreparedStatement prepStmt = con.prepareStatement(update);
+		prepStmt.setLong(1, id);
+		int x = prepStmt.executeUpdate();
+		if (x == 1) {
+			status = true;
+		}
+		prepStmt.close();
+		releaseConnection();
+	} catch (SQLException ex) {
+		releaseConnection();
+		ex.printStackTrace();
+	}
+		return status;
 	}
 
 	public Long identifyId(String token) {
@@ -855,6 +877,82 @@ public class UserDBAO {
 			ex.printStackTrace();
 		}
 		return status;
+	}
+	
+	public int countAllUsers() {
+    	int users = -1;
+    	try {
+    		String selectStatement = "select COUNT(user_id) as users from profile_table";
+    		getConnection();
+    		PreparedStatement prepStmt = con.prepareStatement(selectStatement);
+    		ResultSet rs = prepStmt.executeQuery();	
+    		
+    		if(rs.next()) {
+    			users = rs.getInt("users");
+    		}
+    		prepStmt.close();
+    	}catch(SQLException ex) {
+    		releaseConnection();
+            ex.printStackTrace();
+    	}
+    	releaseConnection();
+    	return users;
+    }
+	
+	public int countOnlineUsers() {
+    	int users = -1;
+    	try {
+    		String selectStatement = "select COUNT(token) as users from profile_table";
+    		getConnection();
+    		PreparedStatement prepStmt = con.prepareStatement(selectStatement);
+    		ResultSet rs = prepStmt.executeQuery();	
+    		
+    		if(rs.next()) {
+    			users = rs.getInt("users");
+    		}
+    		prepStmt.close();
+    	}catch(SQLException ex) {
+    		releaseConnection();
+            ex.printStackTrace();
+    	}
+    	releaseConnection();
+    	return users;
+    }
+	
+	public boolean report(String content) { 
+		   boolean status = false; 
+		   try {
+		   String adminEmail = "w627661598@sina.cn"; 
+		   String adminPassword = "00a55bdf55934c44";
+		   java.util.Properties props = new Properties();
+		   props.put("mail.smtp.auth","true"); 
+		   props.put("mail.smtp.host", "smtp.sina.cn");
+		   props.put("mail.transport.protocol", "smtp");
+		   props.put("mail.user", adminEmail); 
+		   props.put("mail.password",adminPassword);
+		   Authenticator authenticator = new Authenticator() {
+		   @Override 
+		   protected PasswordAuthentication getPasswordAuthentication() {
+		   String userName = props.getProperty("mail.user"); 
+		   String password = props.getProperty("mail.password");
+		   return new PasswordAuthentication(userName, password); 
+		   	} 
+		   };
+		   
+		   Session mailSession = Session.getInstance(props, authenticator); 
+		   MimeMessage message = new MimeMessage(mailSession); 
+		   String username =props.getProperty("mail.user"); 
+		   InternetAddress from = new InternetAddress(username,"GameView"); 
+		   message.setFrom(from); 
+		   InternetAddress toAddress = new InternetAddress(adminEmail); 
+		   message.setRecipient(Message.RecipientType.TO,toAddress); 
+		   message.setSubject("GameView Feedback");
+		   message.setContent(content, "text/html;charset=UTF-8");
+		   Transport.send(message); status = true; 
+		   }catch (Exception e){
+		   e.printStackTrace(); }
+		   
+		   return status; 
 	}
 
 }
