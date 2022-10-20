@@ -106,14 +106,15 @@ public class ScoreDBAO {
 	    return status;
     }
     
-    public boolean checkUserId(Long userId) {
+    public boolean checkUserId(Long userId, Long gameid) {
     	boolean status = false;
     	try {
-    		String selectStatement = "select scoring_id from scoring_table where user_id=?";
+    		String selectStatement = "select scoring_id from scoring_table where user_id=? and game_id=?";
     		getConnection();
     		PreparedStatement prepStmt = con.prepareStatement(selectStatement);
 			
-			prepStmt.setLong(1, userId);  
+			prepStmt.setLong(1, userId); 
+			prepStmt.setLong(2, gameid); 
 			ResultSet rs = prepStmt.executeQuery();
             if (rs.next()) {
             	status = true;       
@@ -132,7 +133,7 @@ public class ScoreDBAO {
     public boolean insertReason(Long userId, Long gameId, int score, String reasons) {
     	boolean status = false;
     	try {
-    		if(checkUserId(userId)==false) {
+    		if(checkUserId(userId,gameId)==false) {
     			String selectStatement = "insert into scoring_table(scoring_id, game_id, user_id, score, reasons_for_scoring, createtime) values (?,?,?,?,?,?);";
         		getConnection();
         		PreparedStatement prepStmt = con.prepareStatement(selectStatement);
