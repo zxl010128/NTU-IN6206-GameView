@@ -16,16 +16,16 @@ import net.sf.json.JSONArray;
 import net.sf.json.JSONObject;
 
 /**
- * Servlet implementation class Profile
+ * Servlet implementation class ProfilePostList
  */
-@WebServlet("/Profile")
-public class Profile extends HttpServlet {
+@WebServlet("/ProfilePostList")
+public class ProfilePostList extends HttpServlet {
 	private static final long serialVersionUID = 1L;
        
     /**
      * @see HttpServlet#HttpServlet()
      */
-    public Profile() {
+    public ProfilePostList() {
         super();
         // TODO Auto-generated constructor stub
     }
@@ -74,8 +74,8 @@ public class Profile extends HttpServlet {
 				datajson.put("dob", user.getdob());
 				datajson.put("gender", user.getgender());
 				datajson.put("post_list", JSONArray.fromObject(commentdbao.findCommentsByUser(user_id)));
-				datajson.put("bookmark_list", JSONArray.fromObject(userdbao.findBookmarksByUser(user_id)));
-				datajson.put("like_list", JSONArray.fromObject(userdbao.findLikesByUser(user_id)));
+//				datajson.put("bookmark_list", JSONArray.fromObject(userdbao.findBookmarksByUser(user_id)));
+//				datajson.put("like_list", JSONArray.fromObject(userdbao.findLikesByUser(user_id)));
 				JSONObject json = new JSONObject();
 				json.put("data", datajson);
 				json.put("message", "success");

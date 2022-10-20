@@ -35,36 +35,15 @@ public class ChangeProfile extends HttpServlet {
 	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 		// TODO Auto-generated method stub
 		
-//		Long id = Long.parseLong(request.getParameter("user_id")); 
-		String username = request.getParameter("username"); 
+//		String username = request.getParameter("username"); 
 		String email = request.getParameter("email"); 
 		String phonenumber = request.getParameter("phonenumber"); 
 		String facepicture = request.getParameter("facepicture"); 
-		String password = request.getParameter("password"); 
+//		String password = request.getParameter("password"); 
 		String dob = request.getParameter("dob"); 
 		int gender = Integer.parseInt(request.getParameter("gender")); 
 		try { 
 			PrintWriter out = response.getWriter();
-			if(phonenumber.length()!=8) {
-				JSONObject jsonObject = new JSONObject();
-				jsonObject.put("data", "");
-				jsonObject.put("message", "wrong number format");
-				jsonObject.put("status_code", 400);
-				out.write(jsonObject.toString()); 
-				out.flush(); 
-				out.close();
-				return;
-			}
-			if(password.length()<6||password.length()>20) {
-				JSONObject jsonObject = new JSONObject();
-				jsonObject.put("data", "");
-				jsonObject.put("message", "invalid length of password");
-				jsonObject.put("status_code", 400);
-				out.write(jsonObject.toString()); 
-				out.flush(); 
-				out.close();
-				return;
-			}
 			UserDBAO userdbao = new UserDBAO();
 			Cookie[] cookie = request.getCookies();
 			Long id = (long)0;
@@ -93,7 +72,27 @@ public class ChangeProfile extends HttpServlet {
 					}
 				}
 			}
-			boolean x = userdbao.changeProfile(username, facepicture, password, email, phonenumber, gender, dob, id);
+			if(phonenumber.length()!=8) {
+				JSONObject jsonObject = new JSONObject();
+				jsonObject.put("data", "");
+				jsonObject.put("message", "wrong number format");
+				jsonObject.put("status_code", 400);
+				out.write(jsonObject.toString()); 
+				out.flush(); 
+				out.close();
+				return;
+			}
+			if(userdbao.ifEmailExists(email)) {
+				JSONObject jsonObject = new JSONObject();
+				jsonObject.put("data", "");
+				jsonObject.put("message", "email exists");
+				jsonObject.put("status_code", 400);
+				out.write(jsonObject.toString()); 
+				out.flush(); 
+				out.close();
+				return;
+			}
+			boolean x = userdbao.changeProfile(facepicture, email, phonenumber, gender, dob, id);
 			if (x == false) {
 				JSONObject jsonObject = new JSONObject();
 				jsonObject.put("data", "");
