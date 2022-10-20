@@ -131,50 +131,49 @@ public class ScoreDBAO {
     }
     
     public boolean insertReason(Long userId, Long gameId, int score, String reasons) {
-    	boolean status = false;
-    	try {
-    		if(checkUserId(userId,gameId)==false) {
-    			String selectStatement = "insert into scoring_table(scoring_id, game_id, user_id, score, reasons_for_scoring, createtime) values (?,?,?,?,?,?);";
-        		getConnection();
-        		PreparedStatement prepStmt = con.prepareStatement(selectStatement);
-        		
-        		Long maxID = (long) 0;
-    			String selectMaxid = "select MAX(scoring_id) as maxid from scoring_table";
-    			Statement statement = con.createStatement();
-    			ResultSet rs = statement.executeQuery(selectMaxid);
-    			if (rs.next()) {
-    				maxID = rs.getLong("maxid");
-    				// System.out.println(maxID);
-    			}
-    			statement.close();
+        boolean status = false;
+        try {
+         if(checkUserId(userId,gameId)==false) {
+          String selectStatement = "insert into scoring_table(scoring_id, game_id, user_id, score, reasons_for_scoring, createtime) values (?,?,?,?,?,?);";
+             getConnection();
+             PreparedStatement prepStmt = con.prepareStatement(selectStatement);
+             
+             Long maxID = (long) 0;
+          String selectMaxid = "select MAX(scoring_id) as maxid from scoring_table";
+          Statement statement = con.createStatement();
+          ResultSet rs = statement.executeQuery(selectMaxid);
+          if (rs.next()) {
+           maxID = rs.getLong("maxid");
+           // System.out.println(maxID);
+          }
+          statement.close();
 
-    			Long scoring_id = maxID + 1;
-    			
-    			prepStmt.setLong(1, scoring_id);
-        		prepStmt.setLong(2, gameId);
-        		prepStmt.setLong(3, userId);
-        		prepStmt.setInt(4, score);
-        		prepStmt.setString(5, reasons);
-        		prepStmt.setTimestamp(6, new java.sql.Timestamp(new java.util.Date().getTime()));
-        		
-        		int x = prepStmt.executeUpdate();
-                if (x == 1) {
-                	status = true;       
-                } 
-                prepStmt.close();
-    		}else {
-    			String selectStatement = "update scoring_table " + "set score=?,reasons_for_scoring=?,createtime=? " + "where user_id=? and game_id=?";
-    			getConnection();
-    			PreparedStatement prepStmt = con.prepareStatement(selectStatement);
-    		
-    			prepStmt.setInt(1, score);
-    			prepStmt.setString(2, reasons);
-    			prepStmt.setTimestamp(3, new java.sql.Timestamp(new java.util.Date().getTime()));
-    			prepStmt.setLong(4, userId);
-    			prepStmt.setLong(5, gameId);
-    		
-    			int x = prepStmt.executeUpdate();
-    			if (x == 1) {
+          Long scoring_id = maxID + 1;
+          
+          prepStmt.setLong(1, scoring_id);
+             prepStmt.setLong(2, gameId);
+             prepStmt.setLong(3, userId);
+             prepStmt.setInt(4, score);
+             prepStmt.setString(5, reasons);
+             prepStmt.setTimestamp(6, new java.sql.Timestamp(new java.util.Date().getTime()));
+             
+             int x = prepStmt.executeUpdate();
+                   if (x == 1) {
+                    status = true;       
+                   } 
+                   prepStmt.close();
+         }else {
+          String selectStatement = "update scoring_table " + "set score=?,reasons_for_scoring=?,createtime=? " + "where user_id=? and game_id=? ";
+          getConnection();
+          PreparedStatement prepStmt = con.prepareStatement(selectStatement);
+         
+          prepStmt.setInt(1, score);
+          prepStmt.setString(2, reasons);
+          prepStmt.setTimestamp(3, new java.sql.Timestamp(new java.util.Date().getTime()));
+          prepStmt.setLong(4, userId);
+          prepStmt.setLong(5, gameId);
+          int x = prepStmt.executeUpdate();
+          if (x == 1) {
     				status = true;       
     			} 
     			prepStmt.close();
