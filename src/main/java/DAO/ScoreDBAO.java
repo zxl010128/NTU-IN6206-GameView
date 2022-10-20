@@ -163,7 +163,7 @@ public class ScoreDBAO {
                 } 
                 prepStmt.close();
     		}else {
-    			String selectStatement = "update scoring_table " + "set score=?,reasons_for_scoring=?,createtime=? " + "where user_id=? ";
+    			String selectStatement = "update scoring_table " + "set score=?,reasons_for_scoring=?,createtime=? " + "where user_id=? and game_id=?";
     			getConnection();
     			PreparedStatement prepStmt = con.prepareStatement(selectStatement);
     		
@@ -171,6 +171,7 @@ public class ScoreDBAO {
     			prepStmt.setString(2, reasons);
     			prepStmt.setTimestamp(3, new java.sql.Timestamp(new java.util.Date().getTime()));
     			prepStmt.setLong(4, userId);
+    			prepStmt.setLong(5, gameId);
     		
     			int x = prepStmt.executeUpdate();
     			if (x == 1) {
