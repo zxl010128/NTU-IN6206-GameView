@@ -42,33 +42,7 @@ public class Redeem extends HttpServlet {
 		try { 
 			PrintWriter out = response.getWriter();
 			UserDBAO userdbao = new UserDBAO();
-			Cookie[] cookie = request.getCookies();
-			Long id = (long)0;
-			if(cookie == null) {
-				JSONObject jsonObject = new JSONObject();
-				jsonObject.put("data", "");
-				jsonObject.put("message", "fail");
-				jsonObject.put("status_code", 401);
-				out.write(jsonObject.toString()); 
-				out.flush(); 
-				out.close();
-				return; 
-			}
-			for(int i=0;i<cookie.length;i++) {
-				if("token".equals(cookie[i].getName())) {
-					id = userdbao.identifyId(cookie[i].getValue());
-					if(id == 0) {
-						JSONObject jsonObject = new JSONObject();
-						jsonObject.put("data", "");
-						jsonObject.put("message", "fail");
-						jsonObject.put("status_code", 401);
-						out.write(jsonObject.toString()); 
-						out.flush(); 
-						out.close();
-						return; 
-					}
-				}
-			}
+			Long id = userdbao.identifyId(request.getParameter("token"));
 			ProductDBAO productdbao = new ProductDBAO();
 			boolean x = productdbao.redeemProduct(product_id,id);
 			System.out.println(x);

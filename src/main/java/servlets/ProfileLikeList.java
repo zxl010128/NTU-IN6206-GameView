@@ -42,15 +42,19 @@ public class ProfileLikeList extends HttpServlet {
 			User user = userdbao.findByUserid(user_id);
 			PrintWriter out = response.getWriter(); 
 			
-			Cookie[] cookie = request.getCookies();
-			Long id = (long)0;
-			for(int i=0;i<cookie.length;i++) {
-				if("token".equals(cookie[i].getName())) {
-					id = userdbao.identifyId(cookie[i].getValue());
-					if(id == user_id) {
-						is_me=1;
-					}
-				}
+//			Cookie[] cookie = request.getCookies();
+//			Long id = (long)0;
+//			for(int i=0;i<cookie.length;i++) {
+//				if("token".equals(cookie[i].getName())) {
+//					id = userdbao.identifyId(cookie[i].getValue());
+//					if(id == user_id) {
+//						is_me=1;
+//					}
+//				}
+//			}
+			Long id = userdbao.identifyId(request.getParameter("token"));
+			if(id == user_id) {
+				is_me=1;
 			}
 			
 			if (user==null) {

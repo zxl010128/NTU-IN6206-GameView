@@ -101,10 +101,10 @@ public class Login extends HttpServlet {
 			return;
 		}
 		
-		Cookie cookie = new Cookie("token",token);
-		cookie.setMaxAge(15*24*60*60);
-		cookie.setPath("/");
-		response.addCookie(cookie);
+//		Cookie cookie = new Cookie("token",token);
+//		cookie.setMaxAge(15*24*60*60);
+//		cookie.setPath("/");
+//		response.addCookie(cookie);
 		
 		JSONObject datajson = new JSONObject();
 		datajson.put("id", id);
