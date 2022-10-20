@@ -38,7 +38,7 @@ public class ChangeProfile extends HttpServlet {
 //		String username = request.getParameter("username"); 
 		String email = request.getParameter("email"); 
 		String phonenumber = request.getParameter("phonenumber"); 
-		String facepicture = request.getParameter("facepicture"); 
+//		String facepicture = request.getParameter("facepicture"); 
 //		String password = request.getParameter("password"); 
 		String dob = request.getParameter("dob"); 
 		int gender = Integer.parseInt(request.getParameter("gender")); 
@@ -92,7 +92,7 @@ public class ChangeProfile extends HttpServlet {
 				out.close();
 				return;
 			}
-			boolean x = userdbao.changeProfile(facepicture, email, phonenumber, gender, dob, id);
+			boolean x = userdbao.changeProfile(email, phonenumber, gender, dob, id);
 			if (x == false) {
 				JSONObject jsonObject = new JSONObject();
 				jsonObject.put("data", "");

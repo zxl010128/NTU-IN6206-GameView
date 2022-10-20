@@ -204,21 +204,21 @@ public class UserDBAO {
 		return status;
 	}
 
-	public boolean changeProfile(String facepicture, String email, String phonenumber,
+	public boolean changeProfile(String email, String phonenumber,
 			int gender, String dob, Long user_id) {
 		boolean status = false;
 		try {
 			String sql = "update profile_table "
-					+ "set facepicture=?,email=?,phonenumber=?,gender=?,dob=? "
+					+ "set email=?,phonenumber=?,gender=?,dob=? "
 					+ "where user_id=? ";
 			getConnection();
 			PreparedStatement prepStmt = con.prepareStatement(sql);
-			prepStmt.setString(1, facepicture);
-			prepStmt.setString(2, email);
-			prepStmt.setString(3, phonenumber);
-			prepStmt.setInt(4, gender);
-			prepStmt.setString(5, dob);
-			prepStmt.setLong(6, user_id);
+//			prepStmt.setString(1, facepicture);
+			prepStmt.setString(1, email);
+			prepStmt.setString(2, phonenumber);
+			prepStmt.setInt(3, gender);
+			prepStmt.setString(4, dob);
+			prepStmt.setLong(5, user_id);
 
 			int x = prepStmt.executeUpdate();
 

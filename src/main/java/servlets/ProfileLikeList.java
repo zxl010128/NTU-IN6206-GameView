@@ -64,7 +64,6 @@ public class ProfileLikeList extends HttpServlet {
 				return;
 			}
 			else {
-				CommentDBAO commentdbao = new CommentDBAO();
 				JSONObject datajson = new JSONObject();
 				datajson.put("is_me", is_me);
 				datajson.put("user_name", user.getUserName());
