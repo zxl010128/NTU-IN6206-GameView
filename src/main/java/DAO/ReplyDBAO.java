@@ -129,5 +129,29 @@ public class ReplyDBAO {
     	return status;
     }
     
+    public List<Reply> getByCommentId(Long commentId){
+        List<Reply> replys = new ArrayList<Reply>();
+        try {
+         String selectStatement = "select reply_id, user_id, content,createtime from reply_table where post_id=?";
+         getConnection();
+         PreparedStatement prepStmt = con.prepareStatement(selectStatement);
+         prepStmt.setLong(1, commentId);
+         ResultSet rs = prepStmt.executeQuery(); 
+         
+         while(rs.next()) {
+          String timeStamp = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(rs.getTimestamp("createtime"));
+          Reply rpl = new Reply(rs.getLong("reply_id"), rs.getLong("user_id"), rs.getString("content"),timeStamp);
+          replys.add(rpl);
+         }
+         prepStmt.close();
+         releaseConnection();
+        }catch(SQLException ex) {
+         releaseConnection();
+               ex.printStackTrace();
+        }
+        
+        return replys;
+        
+       }
     
 }
