@@ -150,7 +150,7 @@ public class UserDBAO {
 			String dob, int gender) {
 		boolean status = false;
 		try {
-			String selectStatement = "insert into profile_table (user_id,username,password,facepicture,phonenumber,email,dob,gender,coin,bookmark_list,token,reset_code,createtime,like_list,post_list) values (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?);";
+			String selectStatement = "insert into profile_table (user_id,username,password,facepicture,phonenumber,email,dob,gender,coin,bookmark_list,token,reset_code,createtime,like_list) values (?,?,?,?,?,?,?,?,?,?,?,?,?,?);";
 			getConnection();
 			PreparedStatement prepStmt = con.prepareStatement(selectStatement);
 
@@ -171,7 +171,7 @@ public class UserDBAO {
 			prepStmt.setLong(1, user_id);
 			prepStmt.setString(2, username);
 			prepStmt.setString(3, password);
-			prepStmt.setString(4, "");
+			prepStmt.setString(4, null);
 			prepStmt.setString(5, phonenumber);
 			prepStmt.setString(6, email);
 			prepStmt.setString(7, dob);
@@ -187,7 +187,6 @@ public class UserDBAO {
 			prepStmt.setString(12, "");
 			prepStmt.setTimestamp(13, new java.sql.Timestamp(new java.util.Date().getTime()));
 			prepStmt.setString(14, "[]");
-			prepStmt.setString(15, "[]");
 
 			int x = prepStmt.executeUpdate();
 
@@ -295,14 +294,14 @@ public class UserDBAO {
 	 public User findByUserid(Long user_id) { 
 		 User ruser= new User(); 
 		 try { 
-			 String selectStatement = "select user_id,username,facepicture,phonenumber,email,dob,gender,createtime,bookmark_list,like_list,post_list " + "from profile_table where user_id = ?"; 
+			 String selectStatement = "select user_id,username,facepicture,phonenumber,email,dob,gender,createtime,bookmark_list,like_list " + "from profile_table where user_id = ?"; 
 			 getConnection(); 
 			 PreparedStatement prepStmt = con.prepareStatement(selectStatement); 
 			 prepStmt.setLong(1,user_id); 
 			 ResultSet rs = prepStmt.executeQuery(); 
 			 if (rs.next()) { 
 				 String timeStamp = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(rs.getTimestamp("createtime"));
-				 User user = new User(rs.getLong("user_id"), rs.getString("username"), rs.getString("facepicture"), rs.getString("phonenumber"), rs.getString("email"),rs.getString("dob"), rs.getInt("gender"),timeStamp,rs.getString("bookmark_list"),rs.getString("like_list"),rs.getString("post_list")); 
+				 User user = new User(rs.getLong("user_id"), rs.getString("username"), rs.getString("facepicture"), rs.getString("phonenumber"), rs.getString("email"),rs.getString("dob"), rs.getInt("gender"),timeStamp,rs.getString("bookmark_list"),rs.getString("like_list")); 
 				 ruser = user;
 				 prepStmt.close(); 
 				 releaseConnection();
