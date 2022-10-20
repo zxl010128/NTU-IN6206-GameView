@@ -1,6 +1,7 @@
 package DAO;
 
 import java.sql.*;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -74,7 +75,8 @@ public class ReplyDBAO {
     		ResultSet rs = prepStmt.executeQuery();	
     		
     		while(rs.next()) {
-    			Reply rpl = new Reply(rs.getLong("reply_id"), rs.getDate("createtime"), rs.getString("content"), rs.getLong("user_id"), rs.getLong("post_id"));
+    			String timeStamp = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(rs.getTimestamp("createtime"));
+    			Reply rpl = new Reply(rs.getLong("reply_id"), timeStamp, rs.getString("content"), rs.getLong("user_id"), rs.getLong("post_id"));
     			replys.add(rpl);
     		}
     		prepStmt.close();

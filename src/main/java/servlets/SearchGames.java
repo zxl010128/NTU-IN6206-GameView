@@ -5,24 +5,26 @@ import java.io.PrintWriter;
 
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
+import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-
-import DAO.UserDBAO;
+import DAO.GameDBAO;
+import entity.Game;
+import net.sf.json.JSONArray;
 import net.sf.json.JSONObject;
 
 /**
- * Servlet implementation class Report
+ * Servlet implementation class SearchGames
  */
-@WebServlet("/Report")
-public class Report extends HttpServlet {
+@WebServlet("/SearchGames")
+public class SearchGames extends HttpServlet {
 	private static final long serialVersionUID = 1L;
        
     /**
      * @see HttpServlet#HttpServlet()
      */
-    public Report() {
+    public SearchGames() {
         super();
         // TODO Auto-generated constructor stub
     }
@@ -32,36 +34,35 @@ public class Report extends HttpServlet {
 	 */
 	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 		// TODO Auto-generated method stub
-		PrintWriter out = response.getWriter(); 
-		String content = request.getParameter("content"); 
-		String name = request.getParameter("name");
-		String contact = request.getParameter("contact");
-		try { 
-		UserDBAO userdbao = new UserDBAO(); 
-		boolean x = userdbao.report(name,content,contact);
-		if(x == false) {
-			JSONObject json = new JSONObject();
-			json.put("data", "");
-			json.put("message", "fail");
-			json.put("status_code", 500);
-			out.write(json.toString());
-			out.flush();
-			out.close();
-			return;
+		String gamename = request.getParameter("gamename");
+		PrintWriter out = response.getWriter();
+		try {
+				GameDBAO gamedbao = new GameDBAO();
+				Game game=gamedbao.findByName(gamename);
+				if(game==null) {
+					JSONObject json = new JSONObject();
+					json.put("data", "");
+					json.put("message", "fail");
+					json.put("status_code", 400);
+					out.write(json.toString());
+					out.flush();
+					out.close();
+					return;
+				}
+				JSONObject json = new JSONObject();
+				json.put("data", JSONObject.fromObject(game));
+				json.put("message", "success");
+				json.put("status_code", 200);
+				out.write(json.toString());
+				out.flush();
+				out.close();
+				return;
+		
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
 		}
-		JSONObject jsonObject=new JSONObject();
-		jsonObject.put("data", "");
-		jsonObject.put("status_code", 200); 
-		jsonObject.put("message", "success"); 
-		out.write(jsonObject.toString()); 
-		out.flush();
-		out.close();
-		return; 
-		} catch (Exception e) { 
-		// TODO Auto-generated catch block 
-		e.printStackTrace(); 
-			}
-		  
+		//redirect
 		
 		}
 

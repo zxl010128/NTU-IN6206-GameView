@@ -382,7 +382,7 @@ public class CommentDBAO {
 			PreparedStatement prepStmt = con.prepareStatement(select);
 			prepStmt.setLong(1, post_id);
 			ResultSet rs = prepStmt.executeQuery();
-			int totalLove = 0;
+//			int totalLove = 0;
 			if (rs.next()) {
 				isgetcoin=rs.getInt("is_get_coin");
 			}
@@ -394,6 +394,29 @@ public class CommentDBAO {
             ex.printStackTrace();
     	}
     	return isgetcoin;
+    }
+    
+    public List<Comment> findCommentsByUser(Long id){
+    	List<Comment> comments = new ArrayList<Comment>();
+    	try {
+			 String selectStatement = "select post_id,content,createtime " + "from comment_table where user_id = ?"; 
+			 getConnection();  	
+			 PreparedStatement prepStmt = con.prepareStatement(selectStatement);
+		     prepStmt.setLong(1, id);
+		     ResultSet rs = prepStmt.executeQuery();
+		     while(rs.next()) {
+		    	 String timeStamp = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(rs.getTimestamp("createtime"));
+		    	 Comment comment = new Comment(rs.getLong("post_id"),rs.getString("content"),timeStamp);
+		    	 comments.add(comment);
+		     }
+		     prepStmt.close();
+		     
+		} catch (SQLException ex) {
+	         releaseConnection();
+	         ex.printStackTrace();
+	    }		        
+	    releaseConnection();
+    	return comments;
     }
     
 }

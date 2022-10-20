@@ -8,7 +8,6 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
-import entity.Comment;
 import entity.Game;
 
 public class GameDBAO {
@@ -114,6 +113,30 @@ public class GameDBAO {
         return game;
     }
     
+    public Game findByName(String name) {
+    	Game game = new Game();  
+		try {
+			 String selectStatement = "select game_id, gamepicture " + "from game_table where gamename = ?"; 
+			 getConnection();  	
+			 PreparedStatement prepStmt = con.prepareStatement(selectStatement);
+		     prepStmt.setString(1, name);
+		     ResultSet rs = prepStmt.executeQuery();
+		     if(rs.next()) {
+		    	 game = new Game(rs.getLong("game_id"),rs.getString("gamepicture"),name);
+		     }
+		     else {
+		    	 game=null;
+		     }
+		     prepStmt.close();
+		     
+		} catch (SQLException ex) {
+	         releaseConnection();
+	         ex.printStackTrace();
+	    }		        
+	    releaseConnection();
+        return game;
+    }
+    
     public List<Game> rankByScore(){
     	List<Game> games = new ArrayList<Game>();
     	try {
@@ -133,6 +156,27 @@ public class GameDBAO {
     	}
     	releaseConnection();
     	return games;
+    }
+    
+    public List<String> getCategories(){
+    	List<String> categories = new ArrayList<String>();
+    	try {
+    		String selectStatement = "select DISTINCT category from game_table";
+    		getConnection();
+    		PreparedStatement prepStmt = con.prepareStatement(selectStatement);
+    		ResultSet rs = prepStmt.executeQuery();	
+    		
+    		while(rs.next()) {
+    			String category = rs.getString("category");
+    			categories.add(category);
+    		}
+    		prepStmt.close();
+    	}catch(SQLException ex) {
+    		releaseConnection();
+            ex.printStackTrace();
+    	}
+    	releaseConnection();
+    	return categories;
     }
     
     public List<Game> getAll() {

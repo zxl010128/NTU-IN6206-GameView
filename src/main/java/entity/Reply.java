@@ -6,7 +6,7 @@ public class Reply {
 	
 	private Long id; // reply id
 	
-	private Date createTime; // reply post time
+	private String createTime; // reply post time
 	
 	private String content; // reply content
 	
@@ -20,7 +20,7 @@ public class Reply {
 	
 	private Comment comment;
 	
-	public Reply(Long id, Date createTime, String content, Long userId, Long CommentId) {
+	public Reply(Long id, String createTime, String content, Long userId, Long CommentId) {
 		this.id = id;
 		this.createTime = createTime;
 		this.content = content;
@@ -29,7 +29,7 @@ public class Reply {
 		//this.replyToId = replyToId;
 	}
 	
-	public Reply(Long id, Date createTime, String content) {
+	public Reply(Long id, String createTime, String content) {
 		this.id = id;
 		this.createTime = createTime;
 		this.content = content;
@@ -43,11 +43,11 @@ public class Reply {
 		this.id = id;
 	}
 	
-	public Date getCreateTime() {
+	public String getCreateTime() {
 		return createTime;
 	}
 	
-	public void setCreateTime(Date createTIme) {
+	public void setCreateTime(String createTime) {
 		this.createTime = createTime;
 	}
 	

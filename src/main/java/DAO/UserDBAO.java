@@ -28,6 +28,8 @@ import javax.mail.internet.MimeMessage;
 import javax.mail.Message;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
+
+import entity.Comment;
 import entity.User;
 
 public class UserDBAO {
@@ -317,7 +319,90 @@ public class UserDBAO {
 	  return ruser; 
 }
 
-
+	 public List<Comment> findBookmarksByUser(Long id){
+	    	List<Comment> comments = new ArrayList<Comment>();
+	    	String bookmark = "";
+	    	try {
+				 String selectStatement = "select bookmark_list " + "from profile_table where user_id = ?"; 
+				 getConnection();  	
+				 PreparedStatement prepStmt = con.prepareStatement(selectStatement);
+			     prepStmt.setLong(1, id);
+			     ResultSet rs = prepStmt.executeQuery();
+			     if(rs.next()) {
+			    	 bookmark = rs.getString("bookmark_list");
+			     }
+			     prepStmt.close();
+			     if(bookmark.equals("[]")) {
+			    	 comments=null;
+			     }
+			     else {
+			    	 bookmark=bookmark.substring(1, bookmark.length()-1);
+			    	 List<String> list = Arrays.asList(bookmark.split(","));
+			    	 for(int i=0;i<list.size();i++) {
+			    		 Long commentid = Long.parseLong(list.get(i));
+			    		 String selectStatement1 = "select content,createtime " + "from comment_table where post_id = ?";   	
+						 PreparedStatement prepStmt1 = con.prepareStatement(selectStatement1);
+					     prepStmt1.setLong(1, commentid);
+					     ResultSet rs1 = prepStmt1.executeQuery();
+					     if(rs1.next()) {
+					    	 String timeStamp = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(rs1.getTimestamp("createtime"));
+					    	 Comment comment = new Comment(commentid,rs1.getString("content"),timeStamp);
+					    	 comments.add(comment);
+					     }
+					     prepStmt1.close();
+			    	 }
+			     }
+			     
+			} catch (SQLException ex) {
+		         releaseConnection();
+		         ex.printStackTrace();
+		    }		        
+		    releaseConnection();
+	    	return comments;
+	    }
+	 
+	 public List<Comment> findLikesByUser(Long id){
+	    	List<Comment> comments = new ArrayList<Comment>();
+	    	String likes = "";
+	    	try {
+				 String selectStatement = "select like_list " + "from profile_table where user_id = ?"; 
+				 getConnection();  	
+				 PreparedStatement prepStmt = con.prepareStatement(selectStatement);
+			     prepStmt.setLong(1, id);
+			     ResultSet rs = prepStmt.executeQuery();
+			     if(rs.next()) {
+			    	 likes = rs.getString("like_list");
+			     }
+			     prepStmt.close();
+			     if(likes.equals("[]")) {
+			    	 comments=null;
+			     }
+			     else {
+			    	likes=likes.substring(1, likes.length()-1);
+			    	 List<String> list = Arrays.asList(likes.split(","));
+			    	 for(int i=0;i<list.size();i++) {
+			    		 Long commentid = Long.parseLong(list.get(i));
+			    		 String selectStatement1 = "select content,createtime " + "from comment_table where post_id = ?";   	
+						 PreparedStatement prepStmt1 = con.prepareStatement(selectStatement1);
+					     prepStmt1.setLong(1, commentid);
+					     ResultSet rs1 = prepStmt1.executeQuery();
+					     if(rs1.next()) {
+					    	 String timeStamp = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(rs1.getTimestamp("createtime"));
+					    	 Comment comment = new Comment(commentid,rs1.getString("content"),timeStamp);
+					    	 comments.add(comment);
+					     }
+					     prepStmt1.close();
+			    	 }
+			     }
+			     
+			} catch (SQLException ex) {
+		         releaseConnection();
+		         ex.printStackTrace();
+		    }		        
+		    releaseConnection();
+	    	return comments;
+	    } 
+	 
 	public Long findByEmail(String email) {
 		Long id = null;
 		try {
@@ -342,6 +427,59 @@ public class UserDBAO {
 			ex.printStackTrace();
 		}
 		return id;
+	}
+	
+	public Long findByName(String name) {
+		Long id = null;
+		try {
+			String selectStatement = "select user_id " + "from profile_table where username = ?";
+			getConnection();
+			PreparedStatement prepStmt = con.prepareStatement(selectStatement);
+			prepStmt.setString(1, name);
+			ResultSet rs = prepStmt.executeQuery();
+			if (rs.next()) {
+				id = rs.getLong("user_id");
+				prepStmt.close();
+				releaseConnection();
+
+			} else {
+				prepStmt.close();
+				releaseConnection();
+
+			}
+
+		} catch (SQLException ex) {
+			releaseConnection();
+			ex.printStackTrace();
+		}
+		return id;
+	}
+	
+	public User findUserByName(String name) {
+		User user = new User();
+		try {
+			String selectStatement = "select user_id,facepicture " + "from profile_table where username = ?";
+			getConnection();
+			PreparedStatement prepStmt = con.prepareStatement(selectStatement);
+			prepStmt.setString(1, name);
+			ResultSet rs = prepStmt.executeQuery();
+			if (rs.next()) {
+				user = new User(rs.getLong("user_id"),rs.getString("facepicture"),name);
+				prepStmt.close();
+				releaseConnection();
+
+			} else {
+				user = null;
+				prepStmt.close();
+				releaseConnection();
+
+			}
+
+		} catch (SQLException ex) {
+			releaseConnection();
+			ex.printStackTrace();
+		}
+		return user;
 	}
 
 	public String findEmailById(Long id) {
@@ -919,7 +1057,7 @@ public class UserDBAO {
     	return users;
     }
 	
-	public boolean report(String content) { 
+	public boolean report(String name,String content, String contact) { 
 		   boolean status = false; 
 		   try {
 		   String adminEmail = "w627661598@sina.cn"; 
@@ -947,12 +1085,16 @@ public class UserDBAO {
 		   InternetAddress toAddress = new InternetAddress(adminEmail); 
 		   message.setRecipient(Message.RecipientType.TO,toAddress); 
 		   message.setSubject("GameView Feedback");
-		   message.setContent(content, "text/html;charset=UTF-8");
+		   String text = "<b>User Name: </b>"+name+"<br>"
+				   +"<b>Feedback Content: </b><br>"+content+"<br>"
+				   +"<b>Contact Infomation: </b>"+contact;
+		   message.setContent(text, "text/html;charset=UTF-8");
 		   Transport.send(message); status = true; 
 		   }catch (Exception e){
 		   e.printStackTrace(); }
 		   
 		   return status; 
 	}
+	
 
 }

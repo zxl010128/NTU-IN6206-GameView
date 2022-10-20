@@ -1,8 +1,12 @@
 package DAO;
 
 import java.sql.*;
+import java.text.SimpleDateFormat;
 
 import entity.Game;
+import entity.Score;
+import java.util.ArrayList;
+import java.util.List;
 
 public class ScoreDBAO {
 	
@@ -180,5 +184,28 @@ public class ScoreDBAO {
     		ex.printStackTrace();
     	}
     	return status;
+    }
+    
+    public List<Score> findScoringByGame(Long id){
+    	List<Score> scores = new ArrayList<Score>();
+    	try {
+    		String selectStatement = "select scoring_id,user_id,score,reasons_for_scoring,createtime from scoring_table where game_id=? order by createtime desc";
+    		getConnection();
+    		PreparedStatement prepStmt = con.prepareStatement(selectStatement);
+    		prepStmt.setLong(1, id); 
+    		ResultSet rs = prepStmt.executeQuery();	
+   
+    		while(rs.next()) {
+    			String timeStamp = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(rs.getTimestamp("createtime"));
+    			Score score = new Score(rs.getLong("scoring_id"), rs.getLong("user_id"), rs.getInt("score"),rs.getString("reasons_for_scoring"),timeStamp);
+    			scores.add(score);
+    		}
+    		prepStmt.close();
+    	}catch(SQLException ex) {
+    		releaseConnection();
+            ex.printStackTrace();
+    	}
+    	releaseConnection();
+    	return scores;
     }
 }

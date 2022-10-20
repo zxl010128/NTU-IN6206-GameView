@@ -41,7 +41,7 @@ public class Login extends HttpServlet {
 		
 		String input = request.getParameter("input"); 
 		String password = request.getParameter("password"); 
-		
+		Long id = (long)0;
 		try { 
 		UserDBAO userdbao = new UserDBAO(); 
 		boolean x = false;
@@ -60,6 +60,7 @@ public class Login extends HttpServlet {
 				return;
 			}
 			x = userdbao.loginByEmail(input, password);
+			id = userdbao.findByEmail(input);
 		}
 		else {
 			ifExists = userdbao.checkUsernameExists(input);
@@ -74,6 +75,7 @@ public class Login extends HttpServlet {
 				return;
 			}
 			x  = userdbao.loginByUsername(input, password); 
+			id = userdbao.findByName(input);
 		}
 		if (x == false) { 
 			JSONObject jsonObject = new JSONObject();
@@ -104,8 +106,11 @@ public class Login extends HttpServlet {
 		cookie.setPath("/");
 		response.addCookie(cookie);
 		
+		JSONObject datajson = new JSONObject();
+		datajson.put("id", id);
+		datajson.put("token", token);
 		JSONObject jsonObject = new JSONObject();
-		jsonObject.put("data", "");
+		jsonObject.put("data", datajson);
 		jsonObject.put("message", "success");
 		jsonObject.put("status_code", 200); 
 		out.write(jsonObject.toString()); 

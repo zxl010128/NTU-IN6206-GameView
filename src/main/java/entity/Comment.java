@@ -48,6 +48,12 @@ public class Comment {
 		this.createTime = createTime;
 	}
 	
+	public Comment(Long id, String content, String createTime) {
+		this.id = id;
+		this.content = content;
+		this.createTime = createTime;
+	}
+	
 	public Comment(String content,int totalLike,String createTime) {
 		
 		this.totalLike = totalLike;

@@ -160,6 +160,12 @@ public class User {
 		this.post_list=post_list;
 	}
 	
+	public User(Long id, String facepic, String userName) {
+		this.id = id;
+		this.userName = userName;
+		this.facepic = facepic;
+	}
+	
 	public User() {
 		
 	}

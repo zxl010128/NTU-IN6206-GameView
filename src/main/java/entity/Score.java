@@ -1,7 +1,5 @@
 package entity;
 
-import java.util.Date;
-
 public class Score {
 	
 	private Long id;
@@ -10,7 +8,7 @@ public class Score {
 	
 	private String reason;
 	
-	private Date createTime;
+	private String createTime;
 	
 	private Long userId;
 	
@@ -39,12 +37,24 @@ public class Score {
 		this.gameId = gameId;
 	}
 	
+	public Score(Long id, Long userId, int score, String reason, String createtime) {
+		this.id = id;
+		this.score = score;
+		this.reason = reason;
+		this.userId = userId;
+		this.createTime=createtime;
+	}
+	
 	public Score() {
 		
 	}
 	
 	public Long getId() {
 		return id;
+	}
+	
+	public Long getUserId() {
+		return userId;
 	}
 	
 	public void setId(Long id) {
