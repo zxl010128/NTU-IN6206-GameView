@@ -233,7 +233,7 @@ public class ProductDBAO {
     		ResultSet rs = prepStmt.executeQuery();	
     		
     		while(rs.next()) {
-    			Product product = new Product(rs.getLong("product_id"),rs.getString("productname"), rs.getInt("productprice"));
+    			Product product = new Product(rs.getLong("product_id"),rs.getString("productname"), rs.getInt("productprice"),rs.getString("product_pic"));
     			products.add(product);
     		}
     		prepStmt.close();

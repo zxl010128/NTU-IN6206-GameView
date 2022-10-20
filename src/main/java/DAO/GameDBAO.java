@@ -9,6 +9,8 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 
 import entity.Game;
+import net.sf.json.JSONArray;
+import net.sf.json.JSONObject;
 
 public class GameDBAO {
 	Connection con;
@@ -165,7 +167,6 @@ public class GameDBAO {
     		getConnection();
     		PreparedStatement prepStmt = con.prepareStatement(selectStatement);
     		ResultSet rs = prepStmt.executeQuery();	
-    		
     		while(rs.next()) {
     			String category = rs.getString("category");
     			categories.add(category);
@@ -177,6 +178,27 @@ public class GameDBAO {
     	}
     	releaseConnection();
     	return categories;
+    }
+    
+    public List<Long> getCategoryId(String category){
+    	List<Long> categoryid = new ArrayList<Long>();
+    	try {
+    		String selectStatement = "select game_id from game_table where category=?";
+    		getConnection();
+    		PreparedStatement prepStmt = con.prepareStatement(selectStatement);
+    		prepStmt.setString(1, category);
+    		ResultSet rs = prepStmt.executeQuery();	
+    		while(rs.next()) {
+    			Long id = rs.getLong("game_id");
+    			categoryid.add(id);
+    		}
+    		prepStmt.close();
+    	}catch(SQLException ex) {
+    		releaseConnection();
+            ex.printStackTrace();
+    	}
+    	releaseConnection();
+    	return categoryid;
     }
     
     public List<Game> getAll() {
@@ -219,6 +241,36 @@ public class GameDBAO {
     	releaseConnection();
     	return games;
     }
+    
+    public JSONArray averageScores(List<String> categories) {
+		JSONArray scorejson = new JSONArray();
+		try {
+			getConnection();
+			for(int i=0;i<categories.size();i++) {
+				String category = categories.get(i);
+				String selectStatement = "select AVG(totalscore) as avgscore from game_table where category=?";
+	    		PreparedStatement prepStmt = con.prepareStatement(selectStatement);
+	    		prepStmt.setString(1, category);
+	    		ResultSet rs = prepStmt.executeQuery();	
+	    		double avgscore = 0;
+	    		if(rs.next()) {
+	    			avgscore = rs.getDouble("avgscore");
+	    		}
+	    		prepStmt.close();
+	    		JSONObject score = new JSONObject();
+	    		score.put("category", category);
+	    		score.put("avgscore", avgscore);
+	    		scorejson.add(score);
+			}
+			
+    		
+    	}catch(SQLException ex) {
+    		releaseConnection();
+            ex.printStackTrace();
+    	}
+    	releaseConnection();
+		return scorejson;
+	}
     
 }
     	

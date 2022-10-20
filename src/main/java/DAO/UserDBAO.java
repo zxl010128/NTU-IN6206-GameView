@@ -1,7 +1,7 @@
 package DAO;
 
 import javax.mail.Authenticator;
-
+import net.sf.json.JSONObject;
 
 
 //import java.util.random.*;
@@ -31,6 +31,7 @@ import java.security.NoSuchAlgorithmException;
 
 import entity.Comment;
 import entity.User;
+import net.sf.json.JSONArray;
 
 public class UserDBAO {
 
@@ -1094,5 +1095,66 @@ public class UserDBAO {
 		   return status; 
 	}
 	
+	public int countMaleUsers() {
+    	int users = -1;
+    	try {
+    		String selectStatement = "select COUNT(user_id) as users from profile_table where gender = 1";
+    		getConnection();
+    		PreparedStatement prepStmt = con.prepareStatement(selectStatement);
+    		ResultSet rs = prepStmt.executeQuery();	
+    		
+    		if(rs.next()) {
+    			users = rs.getInt("users");
+    		}
+    		prepStmt.close();
+    	}catch(SQLException ex) {
+    		releaseConnection();
+            ex.printStackTrace();
+    	}
+    	releaseConnection();
+    	return users;
+    }
+	
+	public int countFemaleUsers() {
+    	int users = -1;
+    	try {
+    		String selectStatement = "select COUNT(user_id) as users from profile_table where gender = 0";
+    		getConnection();
+    		PreparedStatement prepStmt = con.prepareStatement(selectStatement);
+    		ResultSet rs = prepStmt.executeQuery();	
+    		
+    		if(rs.next()) {
+    			users = rs.getInt("users");
+    		}
+    		prepStmt.close();
+    	}catch(SQLException ex) {
+    		releaseConnection();
+            ex.printStackTrace();
+    	}
+    	releaseConnection();
+    	return users;
+    }
 
+	public int countUnknownUsers() {
+    	int users = -1;
+    	try {
+    		String selectStatement = "select COUNT(user_id) as users from profile_table where gender = 2";
+    		getConnection();
+    		PreparedStatement prepStmt = con.prepareStatement(selectStatement);
+    		ResultSet rs = prepStmt.executeQuery();	
+    		
+    		if(rs.next()) {
+    			users = rs.getInt("users");
+    		}
+    		prepStmt.close();
+    	}catch(SQLException ex) {
+    		releaseConnection();
+            ex.printStackTrace();
+    	}
+    	releaseConnection();
+    	return users;
+    }
+	
+	
+	
 }

@@ -6,12 +6,15 @@ public class Product {
 	
 	private String productName; // product name
 	
+	private String product_pic;
+	
 	private int price; // product price
 	
-	public Product(Long id, String product, int price) {
+	public Product(Long id, String productName, int price, String product_pic) {
 		this.id = id;
 		this.productName = productName;
 		this.price = price;
+		this.product_pic=product_pic;
 	}
 	
 	public Product() {
@@ -41,4 +44,9 @@ public class Product {
 	public void setPrice(int price) {
 		this.price = price;
 	}
+	
+	public String getProductPic() {
+		return product_pic;
+	}
+	
 }

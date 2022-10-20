@@ -7,6 +7,8 @@ import java.util.List;
 import DAO.UserDBAO;
 import entity.Comment;
 import entity.Game;
+import net.sf.json.JSONArray;
+import net.sf.json.JSONObject;
 
 public class CommentDBAO {
 	Connection con;
@@ -418,5 +420,29 @@ public class CommentDBAO {
 	    releaseConnection();
     	return comments;
     }
+    
+    public int totalComments(List<Long> ids) {
+		int totalcomments = 0;
+		try {
+			getConnection();
+			for(int i=0;i<ids.size();i++) {
+				Long id = ids.get(i);
+				String selectStatement = "select COUNT(post_id) as commentnum from comment_table where game_id=?";
+	    		PreparedStatement prepStmt = con.prepareStatement(selectStatement);
+	    		prepStmt.setLong(1, id);
+	    		ResultSet rs = prepStmt.executeQuery();	
+	    		
+	    		if(rs.next()) {
+	    			totalcomments +=rs.getInt("commentnum");
+	    		}
+	    		prepStmt.close();
+			}
+    	}catch(SQLException ex) {
+    		releaseConnection();
+            ex.printStackTrace();
+    	}
+    	releaseConnection();
+		return totalcomments;
+	}
     
 }
