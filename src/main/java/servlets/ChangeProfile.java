@@ -6,11 +6,11 @@ import java.io.PrintWriter;
 
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
-import javax.servlet.http.Cookie;
+
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-
+import entity.User;
 import DAO.UserDBAO;
 import net.sf.json.JSONObject;
 
@@ -103,6 +103,12 @@ public class ChangeProfile extends HttpServlet {
 				out.close();
 				return;
 			}
+			
+			if(gender==3) {
+				User user=userdbao.findByUserid(id);
+				gender=user.getgender();
+			}
+			
 			boolean x = userdbao.changeProfile(email, phonenumber, gender, dob, id);
 			if (x == false) {
 				JSONObject jsonObject = new JSONObject();
