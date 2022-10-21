@@ -453,31 +453,29 @@ public class UserDBAO {
 		return id;
 	}
 	
-	public User findUserByName(String name) {
-		User user = new User();
+	public JSONArray findUserByName(String name) {
+		JSONArray usersjson = new JSONArray();
 		try {
-			String selectStatement = "select user_id,facepicture " + "from profile_table where username = ?";
+			name=name.replace(" ", "%");
+			name="%"+name+"%";
+			String selectStatement = "select user_id,facepicture,username " + "from profile_table where username LIKE '"+name+"'";
 			getConnection();
 			PreparedStatement prepStmt = con.prepareStatement(selectStatement);
-			prepStmt.setString(1, name);
 			ResultSet rs = prepStmt.executeQuery();
-			if (rs.next()) {
-				user = new User(rs.getLong("user_id"),rs.getString("facepicture"),name);
-				prepStmt.close();
-				releaseConnection();
-
-			} else {
-				user = null;
-				prepStmt.close();
-				releaseConnection();
-
+			while (rs.next()) {
+				User user = new User(rs.getLong("user_id"),rs.getString("facepicture"),rs.getString("username"));
+				JSONObject userjs = new JSONObject();
+				userjs.put("user", JSONObject.fromObject(user));
+				usersjson.add(userjs);
 			}
+			prepStmt.close();
+			releaseConnection();
 
 		} catch (SQLException ex) {
 			releaseConnection();
 			ex.printStackTrace();
 		}
-		return user;
+		return usersjson;
 	}
 
 	public String findEmailById(Long id) {
