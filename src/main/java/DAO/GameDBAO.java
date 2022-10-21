@@ -142,13 +142,13 @@ public class GameDBAO {
     public List<Game> rankByScore(){
     	List<Game> games = new ArrayList<Game>();
     	try {
-    		String selectStatement = "select gamename,totalscore,gamepicture from game_table order by totalscore desc limit 10";
+    		String selectStatement = "select game_id,gamename,totalscore,gamepicture from game_table order by totalscore desc limit 10";
     		getConnection();
     		PreparedStatement prepStmt = con.prepareStatement(selectStatement);
     		ResultSet rs = prepStmt.executeQuery();	
    
     		while(rs.next()) {
-    			Game gm = new Game(rs.getString("gamename"), rs.getInt("totalscore"), rs.getString("gamepicture"));
+    			Game gm = new Game(rs.getLong("game_id"),rs.getString("gamename"), rs.getInt("totalscore"), rs.getString("gamepicture"));
     			games.add(gm);
     		}
     		prepStmt.close();
