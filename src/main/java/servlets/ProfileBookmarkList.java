@@ -68,11 +68,16 @@ public class ProfileBookmarkList extends HttpServlet {
 				return;
 			}
 			else {
-				CommentDBAO commentdbao = new CommentDBAO();
 				JSONObject datajson = new JSONObject();
 				datajson.put("is_me", is_me);
 				datajson.put("user_name", user.getUserName());
-				datajson.put("facepicture", user.getfacepic());
+				
+				if(user.getfacepic()==null) {
+					datajson.put("facepicture", "");
+				}
+				else {
+				datajson.put("facepicture", user.getfacepic());}
+				
 				datajson.put("phonenumber", user.getphone());
 				datajson.put("email", user.getemail());
 				datajson.put("dob", user.getdob());
@@ -80,6 +85,7 @@ public class ProfileBookmarkList extends HttpServlet {
 //				datajson.put("post_list", JSONArray.fromObject(commentdbao.findCommentsByUser(user_id)));
 				datajson.put("bookmark_list", JSONArray.fromObject(userdbao.findBookmarksByUser(user_id)));
 //				datajson.put("like_list", JSONArray.fromObject(userdbao.findLikesByUser(user_id)));
+				datajson.put("coin", user.getcoin());
 				JSONObject json = new JSONObject();
 				json.put("data", datajson);
 				json.put("message", "success");
