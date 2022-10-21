@@ -48,6 +48,13 @@ public class Game {
 		this.posts = posts;
 	}
 	
+	public Game(Long id,String gameName, String gamepicture, int posts) {
+		this.id=id;
+		this.gameName = gameName;
+		this.gamePicture = gamepicture;
+		this.posts = posts;
+	}
+	
 	public Game(Long id, String gamepicture,String gameName) {
 		this.gameName = gameName;
 		this.gamePicture = gamepicture;
