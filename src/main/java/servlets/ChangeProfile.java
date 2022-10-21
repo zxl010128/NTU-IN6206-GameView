@@ -93,7 +93,9 @@ public class ChangeProfile extends HttpServlet {
 				out.close();
 				return;
 			}
-			if(userdbao.ifEmailExists(email)) {
+			User user=userdbao.findByUserid(id);
+			if(email.equals(user.getemail())==false) {
+				if(userdbao.ifEmailExists(email)) {
 				JSONObject jsonObject = new JSONObject();
 				jsonObject.put("data", "");
 				jsonObject.put("message", "email exists");
@@ -103,9 +105,8 @@ public class ChangeProfile extends HttpServlet {
 				out.close();
 				return;
 			}
-			
+			}
 			if(gender==3) {
-				User user=userdbao.findByUserid(id);
 				gender=user.getgender();
 			}
 			
