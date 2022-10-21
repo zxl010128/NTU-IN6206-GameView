@@ -294,14 +294,14 @@ public class UserDBAO {
 	 public User findByUserid(Long user_id) { 
 		 User ruser= new User(); 
 		 try { 
-			 String selectStatement = "select user_id,username,facepicture,phonenumber,email,dob,gender,createtime,bookmark_list,like_list " + "from profile_table where user_id = ?"; 
+			 String selectStatement = "select user_id,username,facepicture,phonenumber,email,dob,gender,createtime,bookmark_list,like_list,coin " + "from profile_table where user_id = ?"; 
 			 getConnection(); 
 			 PreparedStatement prepStmt = con.prepareStatement(selectStatement); 
 			 prepStmt.setLong(1,user_id); 
 			 ResultSet rs = prepStmt.executeQuery(); 
 			 if (rs.next()) { 
 				 String timeStamp = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(rs.getTimestamp("createtime"));
-				 User user = new User(rs.getLong("user_id"), rs.getString("username"), rs.getString("facepicture"), rs.getString("phonenumber"), rs.getString("email"),rs.getString("dob"), rs.getInt("gender"),timeStamp,rs.getString("bookmark_list"),rs.getString("like_list")); 
+				 User user = new User(rs.getLong("user_id"), rs.getString("username"), rs.getString("facepicture"), rs.getString("phonenumber"), rs.getString("email"),rs.getString("dob"), rs.getInt("gender"),timeStamp,rs.getString("bookmark_list"),rs.getString("like_list"),rs.getInt("coin")); 
 				 ruser = user;
 				 prepStmt.close(); 
 				 releaseConnection();
