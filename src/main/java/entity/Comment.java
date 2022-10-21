@@ -23,8 +23,6 @@ public class Comment {
 	
 	private Long gameId;
 	
-	private User user;
-	
 	private Game game;
 	
 	public Comment(Long id, int totalLike, int totalDislike, int totalLove, String content, String createTime, int isGetCoin, Long userId, Long gameId) {
@@ -48,6 +46,13 @@ public class Comment {
 		this.createTime = createTime;
 	}
 	
+	public Comment(Long id, String content, String createTime,Long userId) {
+		this.id = id;
+		this.content = content;
+		this.createTime = createTime;
+		this.userId=userId;
+	}
+	
 	public Comment(Long id, String content, String createTime) {
 		this.id = id;
 		this.content = content;
@@ -58,6 +63,13 @@ public class Comment {
 		
 		this.totalLike = totalLike;
 		
+		this.content = content;
+		this.createTime = createTime;
+	}
+	
+public Comment(Long id,String content,int totalLike,String createTime) {
+		this.id=id;
+		this.totalLike = totalLike;
 		this.content = content;
 		this.createTime = createTime;
 	}
@@ -138,13 +150,10 @@ public class Comment {
 		isGetCoin = 1;
 	}
 	
-    public User getUser() {
-        return user;
+    public Long getUserId() {
+        return userId;
     }
 
-    public void setUser(User user) {
-        this.user = user;
-    }
     
     public Game getGame() {
         return game;
