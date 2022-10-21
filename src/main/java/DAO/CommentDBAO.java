@@ -310,6 +310,38 @@ public class CommentDBAO {
     	return status;
     }
     
+    public boolean deleteLike(Long commentId) {
+    	boolean status = false;
+    	try {
+    		String select = "select totallike from comment_table where post_id = ?";
+			getConnection();
+			PreparedStatement prepStmt = con.prepareStatement(select);
+			prepStmt.setLong(1, commentId);
+			ResultSet rs = prepStmt.executeQuery();
+			int totalLike = 0;
+			if (rs.next()) {
+				totalLike = rs.getInt("totallike") - 1;
+			}
+			prepStmt.close();
+			
+    		String selectStatement = "update comment_table " + "set totallike=? " + "where post_id=? ";
+            PreparedStatement prepStmt0 = con.prepareStatement(selectStatement);
+            prepStmt0.setInt(1, totalLike);
+            prepStmt0.setLong(2, commentId);
+            int x = prepStmt0.executeUpdate();
+            if (x == 1) {	
+            	status = true;       
+            } 
+            prepStmt0.close();
+            releaseConnection();
+    		
+    	} catch(SQLException ex) {
+    		releaseConnection();
+            ex.printStackTrace();
+    	}
+    	return status;
+    }
+    
     public boolean deleteComment(Long id) {
     	boolean status = false;
     	try {
