@@ -37,6 +37,16 @@ public class Validation extends HttpServlet {
 		String email = request.getParameter("email");
 		String newPwd = request.getParameter("newpassword");
 		try { 
+			if(email.length()>40) {
+				JSONObject jsonObject = new JSONObject();
+				jsonObject.put("data", "");
+				jsonObject.put("message", "too long email");
+				jsonObject.put("status_code", 400);
+				out.write(jsonObject.toString()); 
+				out.flush(); 
+				out.close();
+				return;
+			}
 			if(newPwd.length()<6||newPwd.length()>20) {
 				JSONObject jsonObject = new JSONObject();
 				jsonObject.put("data", "");
@@ -48,11 +58,22 @@ public class Validation extends HttpServlet {
 				return;
 			}
 		UserDBAO userdbao = new UserDBAO(); 
+		boolean email_exists = userdbao.ifEmailExists(email); 
+		if (email_exists == false) { 
+			JSONObject jsonObject = new JSONObject();
+			jsonObject.put("data", "");
+			jsonObject.put("message", "email doesn't exist");
+			jsonObject.put("status_code", 400);
+			out.write(jsonObject.toString()); 
+			out.flush(); 
+			out.close();
+			return;
+		}
 		boolean x  = userdbao.validationCode(email, resetcode); 
 		if (x == false) { 
 			JSONObject json = new JSONObject();
 			json.put("data", "");
-			json.put("message", "fail");
+			json.put("message", "wrong reset code");
 			json.put("status_code", 400);
 			out.write(json.toString());
 			out.flush();
