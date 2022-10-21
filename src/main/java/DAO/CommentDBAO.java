@@ -336,13 +336,13 @@ public class CommentDBAO {
     public List<Game> rankByPosts(){
     	List<Game> games = new ArrayList<Game>();
     	try {
-    		String selectStatement = "select game_table.gamename,game_table.gamepicture,(select COUNT(post_id) from comment_table where comment_table.game_id=game_table.game_id) posts from game_table order by posts desc limit 10";
+    		String selectStatement = "select game_table.game_id,game_table.gamename,game_table.gamepicture,(select COUNT(post_id) from comment_table where comment_table.game_id=game_table.game_id) posts from game_table order by posts desc limit 10";
     		getConnection();
     		PreparedStatement prepStmt = con.prepareStatement(selectStatement);
     		ResultSet rs = prepStmt.executeQuery();	
    
     		while(rs.next()) {
-    			Game gm = new Game(rs.getString("gamename"),rs.getString("gamepicture"),rs.getInt("posts"));
+    			Game gm = new Game(rs.getLong("game_id"),rs.getString("gamename"),rs.getString("gamepicture"),rs.getInt("posts"));
     			games.add(gm);
     		}
     		prepStmt.close();
@@ -357,14 +357,14 @@ public class CommentDBAO {
     public List<Comment> rankByLikes(){
     	List<Comment> comments = new ArrayList<Comment>();
     	try {
-    		String selectStatement = "select content,totallike,createtime from comment_table order by totallike desc limit 10";
+    		String selectStatement = "select post_id,content,totallike,createtime from comment_table order by totallike desc limit 10";
     		getConnection();
     		PreparedStatement prepStmt = con.prepareStatement(selectStatement);
     		ResultSet rs = prepStmt.executeQuery();	
    
     		while(rs.next()) {
     			String timeStamp = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(rs.getTimestamp("createtime"));
-    			Comment comment = new Comment(rs.getString("content"), rs.getInt("totallike"), timeStamp);
+    			Comment comment = new Comment(rs.getLong("post_id"),rs.getString("content"), rs.getInt("totallike"), timeStamp);
     			comments.add(comment);
     		}
     		prepStmt.close();
