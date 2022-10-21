@@ -72,11 +72,18 @@ public class ProfilePostList extends HttpServlet {
 				JSONObject datajson = new JSONObject();
 				datajson.put("is_me", is_me);
 				datajson.put("user_name", user.getUserName());
-				datajson.put("facepicture", user.getfacepic());
+				
+				if(user.getfacepic()==null) {
+					datajson.put("facepicture", "");
+				}
+				else {
+				datajson.put("facepicture", user.getfacepic());}
+				
 				datajson.put("phonenumber", user.getphone());
 				datajson.put("email", user.getemail());
 				datajson.put("dob", user.getdob());
 				datajson.put("gender", user.getgender());
+				datajson.put("coin", user.getcoin());
 				datajson.put("post_list", JSONArray.fromObject(commentdbao.findCommentsByUser(user_id)));
 //				datajson.put("bookmark_list", JSONArray.fromObject(userdbao.findBookmarksByUser(user_id)));
 //				datajson.put("like_list", JSONArray.fromObject(userdbao.findLikesByUser(user_id)));
