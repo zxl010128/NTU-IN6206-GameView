@@ -38,8 +38,8 @@ public class SearchGames extends HttpServlet {
 		PrintWriter out = response.getWriter();
 		try {
 				GameDBAO gamedbao = new GameDBAO();
-				Game game=gamedbao.findByName(gamename);
-				if(game==null) {
+				JSONArray games=gamedbao.findByName(gamename);
+				if(games.size()==0) {
 					JSONObject json = new JSONObject();
 					json.put("data", "");
 					json.put("message", "fail");
@@ -50,7 +50,7 @@ public class SearchGames extends HttpServlet {
 					return;
 				}
 				JSONObject json = new JSONObject();
-				json.put("data", JSONObject.fromObject(game));
+				json.put("data", games);
 				json.put("message", "success");
 				json.put("status_code", 200);
 				out.write(json.toString());
