@@ -100,28 +100,28 @@ public class CommentDBAO {
     }
     
     public Comment getById(Long id) {
-    	Comment comment = new Comment();  
-		try {
-			 String selectStatement = "select *  where id = ?";
-			 getConnection();  	
-			 PreparedStatement prepStmt = con.prepareStatement(selectStatement);
-		     prepStmt.setLong(1, id);
-		     ResultSet rs = prepStmt.executeQuery();
-		     while(rs.next()) {
-		    	 String timeStamp = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(rs.getTimestamp("createtime"));
-//		    	 Comment cmt = new Comment(rs.getLong("post_id"), rs.getInt("totallike"), rs.getInt("totaldislike"), rs.getInt("totallove"), rs.getString("content"), rs.getDate("createtime"));
-		    	 Comment cmt = new Comment(rs.getLong("post_id"), rs.getInt("totallike"), rs.getInt("totaldislike"), rs.getInt("totallove"), rs.getString("content"), timeStamp);
-		    	 comment = cmt;
-		     }
-		     prepStmt.close();
-		     
-		} catch (SQLException ex) {
-	         releaseConnection();
-	         ex.printStackTrace();
-	    }		        
-	    releaseConnection();
-        return comment;
-    }
+        Comment comment = new Comment();  
+     try {
+       String selectStatement = "select * from comment_table where post_id = ?";
+       getConnection();   
+       PreparedStatement prepStmt = con.prepareStatement(selectStatement);
+          prepStmt.setLong(1, id);
+          ResultSet rs = prepStmt.executeQuery();
+          while(rs.next()) {
+           String timeStamp = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(rs.getTimestamp("createtime"));
+//           Comment cmt = new Comment(rs.getLong("post_id"), rs.getInt("totallike"), rs.getInt("totaldislike"), rs.getInt("totallove"), rs.getString("content"), rs.getDate("createtime"));
+           Comment cmt = new Comment(rs.getLong("post_id"), rs.getInt("totallike"), rs.getInt("totaldislike"), rs.getInt("totallove"), rs.getString("content"), timeStamp);
+           comment = cmt;
+          }
+          prepStmt.close();
+          
+     } catch (SQLException ex) {
+             releaseConnection();
+             ex.printStackTrace();
+        }          
+        releaseConnection();
+           return comment;
+       }
     
     public boolean insertComment(Long userId, Long gameId, String content) {
     	boolean status = false;
@@ -310,6 +310,38 @@ public class CommentDBAO {
     	return status;
     }
     
+    public boolean deleteLike(Long commentId) {
+    	boolean status = false;
+    	try {
+    		String select = "select totallike from comment_table where post_id = ?";
+			getConnection();
+			PreparedStatement prepStmt = con.prepareStatement(select);
+			prepStmt.setLong(1, commentId);
+			ResultSet rs = prepStmt.executeQuery();
+			int totalLike = 0;
+			if (rs.next()) {
+				totalLike = rs.getInt("totallike") - 1;
+			}
+			prepStmt.close();
+			
+    		String selectStatement = "update comment_table " + "set totallike=? " + "where post_id=? ";
+            PreparedStatement prepStmt0 = con.prepareStatement(selectStatement);
+            prepStmt0.setInt(1, totalLike);
+            prepStmt0.setLong(2, commentId);
+            int x = prepStmt0.executeUpdate();
+            if (x == 1) {	
+            	status = true;       
+            } 
+            prepStmt0.close();
+            releaseConnection();
+    		
+    	} catch(SQLException ex) {
+    		releaseConnection();
+            ex.printStackTrace();
+    	}
+    	return status;
+    }
+    
     public boolean deleteComment(Long id) {
     	boolean status = false;
     	try {
@@ -444,5 +476,29 @@ public class CommentDBAO {
     	releaseConnection();
 		return totalcomments;
 	}
+    
+    public List<Comment> findCommentByGame(Long id){
+        List<Comment> comments = new ArrayList<Comment>();
+        try {
+         String selectStatement = "select post_id,content,createtime,user_id from comment_table where game_id=? order by createtime desc";
+         getConnection();
+         PreparedStatement prepStmt = con.prepareStatement(selectStatement);
+         prepStmt.setLong(1, id); 
+         ResultSet rs = prepStmt.executeQuery();
+         
+         while(rs.next()) {
+          String timeStamp = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(rs.getTimestamp("createtime"));
+          Comment comment = new Comment(rs.getLong("post_id"),rs.getString("content"),timeStamp,rs.getLong("user_id"));
+          comments.add(comment);
+         }
+         prepStmt.close();
+         
+        }catch (SQLException ex) {
+             releaseConnection();
+             ex.printStackTrace();
+        }
+        releaseConnection();
+        return comments;
+       }
     
 }

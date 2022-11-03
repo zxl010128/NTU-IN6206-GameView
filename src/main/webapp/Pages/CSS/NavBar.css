@@ -1,0 +1,17 @@
+@charset "UTF-8";
+
+.navbarLogo {
+	width: 50px;
+	cursor: pointer;
+}
+
+#navBar {	
+	background-color: rgba(255,255,255,0.5)
+}
+
+.joinUsText {
+	font-family: Lucida Console;
+	margin-right: 20px;
+	color: orange;
+	cursor: pointer;
+}

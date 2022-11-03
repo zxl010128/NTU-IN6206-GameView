@@ -29,6 +29,13 @@ public class Reply {
 		//this.replyToId = replyToId;
 	}
 	
+	public Reply(Long id, Long userId, String content, String createTime) {
+		this.id = id;
+		this.createTime = createTime;
+		this.content = content;
+		this.userId = userId;
+	}
+	
 	public Reply(Long id, String createTime, String content) {
 		this.id = id;
 		this.createTime = createTime;
@@ -41,6 +48,10 @@ public class Reply {
 	
 	public void setID(Long id) {
 		this.id = id;
+	}
+	
+	public Long getUserId() {
+		return userId;
 	}
 	
 	public String getCreateTime() {

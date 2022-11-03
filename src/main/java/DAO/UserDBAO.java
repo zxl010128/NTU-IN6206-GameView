@@ -150,7 +150,7 @@ public class UserDBAO {
 			String dob, int gender) {
 		boolean status = false;
 		try {
-			String selectStatement = "insert into profile_table (user_id,username,password,facepicture,phonenumber,email,dob,gender,coin,bookmark_list,token,reset_code,createtime,like_list,post_list) values (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?);";
+			String selectStatement = "insert into profile_table (user_id,username,password,facepicture,phonenumber,email,dob,gender,coin,bookmark_list,token,reset_code,createtime,like_list) values (?,?,?,?,?,?,?,?,?,?,?,?,?,?);";
 			getConnection();
 			PreparedStatement prepStmt = con.prepareStatement(selectStatement);
 
@@ -171,7 +171,7 @@ public class UserDBAO {
 			prepStmt.setLong(1, user_id);
 			prepStmt.setString(2, username);
 			prepStmt.setString(3, password);
-			prepStmt.setString(4, "");
+			prepStmt.setString(4, null);
 			prepStmt.setString(5, phonenumber);
 			prepStmt.setString(6, email);
 			prepStmt.setString(7, dob);
@@ -187,7 +187,6 @@ public class UserDBAO {
 			prepStmt.setString(12, "");
 			prepStmt.setTimestamp(13, new java.sql.Timestamp(new java.util.Date().getTime()));
 			prepStmt.setString(14, "[]");
-			prepStmt.setString(15, "[]");
 
 			int x = prepStmt.executeUpdate();
 
@@ -204,21 +203,21 @@ public class UserDBAO {
 		return status;
 	}
 
-	public boolean changeProfile(String facepicture, String email, String phonenumber,
+	public boolean changeProfile(String email, String phonenumber,
 			int gender, String dob, Long user_id) {
 		boolean status = false;
 		try {
 			String sql = "update profile_table "
-					+ "set facepicture=?,email=?,phonenumber=?,gender=?,dob=? "
+					+ "set email=?,phonenumber=?,gender=?,dob=? "
 					+ "where user_id=? ";
 			getConnection();
 			PreparedStatement prepStmt = con.prepareStatement(sql);
-			prepStmt.setString(1, facepicture);
-			prepStmt.setString(2, email);
-			prepStmt.setString(3, phonenumber);
-			prepStmt.setInt(4, gender);
-			prepStmt.setString(5, dob);
-			prepStmt.setLong(6, user_id);
+//			prepStmt.setString(1, facepicture);
+			prepStmt.setString(1, email);
+			prepStmt.setString(2, phonenumber);
+			prepStmt.setInt(3, gender);
+			prepStmt.setString(4, dob);
+			prepStmt.setLong(5, user_id);
 
 			int x = prepStmt.executeUpdate();
 
@@ -295,14 +294,14 @@ public class UserDBAO {
 	 public User findByUserid(Long user_id) { 
 		 User ruser= new User(); 
 		 try { 
-			 String selectStatement = "select user_id,username,facepicture,phonenumber,email,dob,gender,createtime,bookmark_list,like_list,post_list " + "from profile_table where user_id = ?"; 
+			 String selectStatement = "select user_id,username,facepicture,phonenumber,email,dob,gender,createtime,bookmark_list,like_list,coin " + "from profile_table where user_id = ?"; 
 			 getConnection(); 
 			 PreparedStatement prepStmt = con.prepareStatement(selectStatement); 
 			 prepStmt.setLong(1,user_id); 
 			 ResultSet rs = prepStmt.executeQuery(); 
 			 if (rs.next()) { 
 				 String timeStamp = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(rs.getTimestamp("createtime"));
-				 User user = new User(rs.getLong("user_id"), rs.getString("username"), rs.getString("facepicture"), rs.getString("phonenumber"), rs.getString("email"),rs.getString("dob"), rs.getInt("gender"),timeStamp,rs.getString("bookmark_list"),rs.getString("like_list"),rs.getString("post_list")); 
+				 User user = new User(rs.getLong("user_id"), rs.getString("username"), rs.getString("facepicture"), rs.getString("phonenumber"), rs.getString("email"),rs.getString("dob"), rs.getInt("gender"),timeStamp,rs.getString("bookmark_list"),rs.getString("like_list"),rs.getInt("coin")); 
 				 ruser = user;
 				 prepStmt.close(); 
 				 releaseConnection();
@@ -454,31 +453,29 @@ public class UserDBAO {
 		return id;
 	}
 	
-	public User findUserByName(String name) {
-		User user = new User();
+	public JSONArray findUserByName(String name) {
+		JSONArray usersjson = new JSONArray();
 		try {
-			String selectStatement = "select user_id,facepicture " + "from profile_table where username = ?";
+			name=name.replace(" ", "%");
+			name="%"+name+"%";
+			String selectStatement = "select user_id,facepicture,username " + "from profile_table where username LIKE '"+name+"'";
 			getConnection();
 			PreparedStatement prepStmt = con.prepareStatement(selectStatement);
-			prepStmt.setString(1, name);
 			ResultSet rs = prepStmt.executeQuery();
-			if (rs.next()) {
-				user = new User(rs.getLong("user_id"),rs.getString("facepicture"),name);
-				prepStmt.close();
-				releaseConnection();
-
-			} else {
-				user = null;
-				prepStmt.close();
-				releaseConnection();
-
+			while (rs.next()) {
+				User user = new User(rs.getLong("user_id"),rs.getString("facepicture"),rs.getString("username"));
+				JSONObject userjs = new JSONObject();
+				userjs.put("user", JSONObject.fromObject(user));
+				usersjson.add(userjs);
 			}
+			prepStmt.close();
+			releaseConnection();
 
 		} catch (SQLException ex) {
 			releaseConnection();
 			ex.printStackTrace();
 		}
-		return user;
+		return usersjson;
 	}
 
 	public String findEmailById(Long id) {
@@ -763,126 +760,6 @@ public class UserDBAO {
 		return id;
 	}
 
-//	public boolean newFollowing(Long followerid, Long followedid) {
-//		boolean status = false;
-//		try {
-//			String select = "select following_list from profile_table where user_id = ?";
-//			getConnection();
-//			PreparedStatement prepStmt1 = con.prepareStatement(select);
-//			prepStmt1.setLong(1, followerid);
-//			ResultSet rs = prepStmt1.executeQuery();
-//			String followinglist = "";
-//			if (rs.next()) {
-//				followinglist = rs.getString("following_list");
-//				if (followinglist == "") {
-//					followinglist = String.valueOf(followedid);
-//				} else {
-//					followinglist = followinglist + "," + String.valueOf(followedid);
-//				}
-//				prepStmt1.close();
-//			} else {
-//				prepStmt1.close();
-//				releaseConnection();
-//				return status;
-//			}
-//
-//			String update = "update profile_table " + "set following_list=? " + "where user_id=? ";
-//			PreparedStatement prepStmt2 = con.prepareStatement(update);
-//			prepStmt2.setString(1, followinglist);
-//			prepStmt2.setLong(2, followerid);
-//			int x = prepStmt2.executeUpdate();
-//			if (x == 1) {
-//				status = true;
-//			}
-//			prepStmt2.close();
-//			releaseConnection();
-//		} catch (SQLException ex) {
-//			releaseConnection();
-//			ex.printStackTrace();
-//		}
-//		return status;
-//	}
-//
-//	public boolean unfollow(Long followerid, Long followedid) {
-//		boolean status = false;
-//		try {
-//			String select = "select following_list from profile_table where user_id = ?";
-//			getConnection();
-//			PreparedStatement prepStmt1 = con.prepareStatement(select);
-//			prepStmt1.setLong(1, followerid);
-//			ResultSet rs = prepStmt1.executeQuery();
-//			String followinglist = "";
-//			if (rs.next()) {
-//				followinglist = rs.getString("following_list");
-//				prepStmt1.close();
-//			} else {
-//				prepStmt1.close();
-//				releaseConnection();
-//				return status;
-//			}
-//
-//			String update = "update profile_table " + "set following_list=? " + "where user_id=? ";
-//			PreparedStatement prepStmt2 = con.prepareStatement(update);
-//
-//			List<String> list = Arrays.asList(followinglist.split(","));
-//			list.remove(String.valueOf(followedid));
-//			followinglist = String.join(",", list);
-//
-//			prepStmt2.setString(1, followinglist);
-//			prepStmt2.setLong(2, followerid);
-//			int x = prepStmt2.executeUpdate();
-//			if (x == 1) {
-//				status = true;
-//			}
-//			prepStmt2.close();
-//			releaseConnection();
-//		} catch (SQLException ex) {
-//			releaseConnection();
-//			ex.printStackTrace();
-//		}
-//		return status;
-//	}
-
-//	public boolean removeFans(Long followerid, Long followedid) {
-//		boolean status = false;
-//		try {
-//			String select = "select fans_list from profile_table where user_id = ?";
-//			getConnection();
-//			PreparedStatement prepStmt1 = con.prepareStatement(select);
-//			prepStmt1.setLong(1, followedid);
-//			ResultSet rs = prepStmt1.executeQuery();
-//			String fanslist = "";
-//			if (rs.next()) {
-//				fanslist = rs.getString("fans_list");
-//				prepStmt1.close();
-//			} else {
-//				prepStmt1.close();
-//				releaseConnection();
-//				return status;
-//			}
-//
-//			String update = "update profile_table " + "set fans_list=? " + "where user_id=? ";
-//			PreparedStatement prepStmt2 = con.prepareStatement(update);
-//
-//			List<String> list = Arrays.asList(fanslist.split(","));
-//			list.remove(String.valueOf(followerid));
-//			fanslist = String.join(",", list);
-//
-//			prepStmt2.setString(1, fanslist);
-//			prepStmt2.setLong(2, followedid);
-//			int x = prepStmt2.executeUpdate();
-//			if (x == 1) {
-//				status = true;
-//			}
-//			prepStmt2.close();
-//			releaseConnection();
-//		} catch (SQLException ex) {
-//			releaseConnection();
-//			ex.printStackTrace();
-//		}
-//		return status;
-//	}
-
 	// ������ǩid��Long
 
 	public boolean newBookmark(Long userid, Long id) {
@@ -981,11 +858,15 @@ public class UserDBAO {
 			ResultSet rs = prepStmt1.executeQuery();
 			String bookmarklist = "";
 			if (rs.next()) {
-				bookmarklist = rs.getString("bookmarklist");
+				bookmarklist = rs.getString("bookmark_list");
 				if(bookmarklist.indexOf(",")==-1) {
 					bookmarklist = "[]";
 				}else {
-					bookmarklist.replace(","+id, "");
+					bookmarklist=bookmarklist.substring(1, bookmarklist.length()-1);
+					List<String> list = new ArrayList<String>(Arrays.asList(bookmarklist.split(",")));
+					list.remove(String.valueOf(id));
+					bookmarklist = String.join(",", list);
+					bookmarklist="["+bookmarklist+"]";
 				}
 				prepStmt1.close();
 			} else {
@@ -994,14 +875,55 @@ public class UserDBAO {
 				return status;
 			}
 
-			String update = "update profile_table " + "set bookmarklist=? " + "where user_id=? ";
+			String update = "update profile_table " + "set bookmark_list=? " + "where user_id=? ";
 			PreparedStatement prepStmt2 = con.prepareStatement(update);
 
-			List<String> list = Arrays.asList(bookmarklist.split(","));
-			list.remove(String.valueOf(id));
-			bookmarklist = String.join(",", list);
-
 			prepStmt2.setString(1, bookmarklist);
+			prepStmt2.setLong(2, userid);
+			int x = prepStmt2.executeUpdate();
+			if (x == 1) {
+				status = true;
+			}
+			prepStmt2.close();
+			releaseConnection();
+		} catch (SQLException ex) {
+			releaseConnection();
+			ex.printStackTrace();
+		}
+		return status;
+	}
+	
+	public boolean removeLike(Long userid, Long id) {
+		boolean status = false;
+		try {
+			String select = "select like_list from profile_table where user_id = ?";
+			getConnection();
+			PreparedStatement prepStmt1 = con.prepareStatement(select);
+			prepStmt1.setLong(1, userid);
+			ResultSet rs = prepStmt1.executeQuery();
+			String likelist = "";
+			if (rs.next()) {
+				likelist = rs.getString("like_list");
+				if(likelist.indexOf(",")==-1) {
+					likelist = "[]";
+				}else {
+					likelist=likelist.substring(1, likelist.length()-1);
+					List<String> list = new ArrayList<String>(Arrays.asList(likelist.split(",")));
+					list.remove(String.valueOf(id));
+					likelist = String.join(",", list);
+					likelist="["+likelist+"]";
+				}
+				prepStmt1.close();
+			} else {
+				prepStmt1.close();
+				releaseConnection();
+				return status;
+			}
+
+			String update = "update profile_table " + "set like_list=? " + "where user_id=? ";
+			PreparedStatement prepStmt2 = con.prepareStatement(update);
+
+			prepStmt2.setString(1, likelist);
 			prepStmt2.setLong(2, userid);
 			int x = prepStmt2.executeUpdate();
 			if (x == 1) {
@@ -1155,6 +1077,83 @@ public class UserDBAO {
     	return users;
     }
 	
+	public boolean ifBookmarkExists(Long id,Long post_id) {
+    	boolean status = false;
+    	try {
+    		String selectStatement = "select bookmark_list from profile_table where user_id=?";
+    		getConnection();
+    		PreparedStatement prepStmt = con.prepareStatement(selectStatement);
+    		prepStmt.setLong(1, id);
+    		ResultSet rs = prepStmt.executeQuery();	
+    		String bookmarklist = "";
+    		if(rs.next()) {
+    			bookmarklist = rs.getString("bookmark_list");
+    		}
+    		prepStmt.close();
+    		
+    		bookmarklist=bookmarklist.substring(1, bookmarklist.length()-1);
+			List<String> list = new ArrayList<String>(Arrays.asList(bookmarklist.split(",")));
+			if(list.contains(String.valueOf(post_id))) {
+				status = true;
+			}
+    		
+    	}catch(SQLException ex) {
+    		releaseConnection();
+            ex.printStackTrace();
+    	}
+    	releaseConnection();
+    	return status;
+    }
 	
+	public boolean ifLikeExists(Long id,Long post_id) {
+    	boolean status = false;
+    	try {
+    		String selectStatement = "select like_list from profile_table where user_id=?";
+    		getConnection();
+    		PreparedStatement prepStmt = con.prepareStatement(selectStatement);
+    		prepStmt.setLong(1, id);
+    		ResultSet rs = prepStmt.executeQuery();	
+    		String likelist = "";
+    		if(rs.next()) {
+    			likelist = rs.getString("like_list");
+    		}
+    		prepStmt.close();
+    		
+    		likelist=likelist.substring(1, likelist.length()-1);
+			List<String> list = new ArrayList<String>(Arrays.asList(likelist.split(",")));
+			
+			if(list.contains(String.valueOf(post_id))) {
+				status = true;
+			}
+    		
+    	}catch(SQLException ex) {
+    		releaseConnection();
+            ex.printStackTrace();
+    	}
+    	releaseConnection();
+    	return status;
+    }
+	
+	public boolean changeFacepic(Long id, String facepic) {
+		  boolean status = false;
+		  try {
+		   String update = "update profile_table " + "set facepicture=? " + "where user_id=?";
+		   getConnection();
+		   PreparedStatement prepStmt = con.prepareStatement(update);
+		   prepStmt.setString(1, facepic);
+		   prepStmt.setLong(2, id);
+		   int x = prepStmt.executeUpdate();
+		   if (x == 1) {
+		    status = true;
+		   }
+		   prepStmt.close();
+		   releaseConnection();
+		  } catch (SQLException ex) {
+		   releaseConnection();
+		   ex.printStackTrace();
+		  }
+		  
+		  return status;
+		 }
 	
 }

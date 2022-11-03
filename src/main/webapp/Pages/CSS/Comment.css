@@ -1,0 +1,68 @@
+@charset "UTF-8";
+
+.commentContainer {
+	background-color: #18123d;
+}
+
+.profileInfoTitle {
+	margin-top: 20px
+}
+
+@media screen and (min-width: 600px) {
+	.gameInfoBox {
+		width: 100%;
+		color: white;
+		font-family: Lucida Console;
+		display: flex;
+		flex-direction: row;
+		justify-content: space-evenly;
+		align-items: center;
+		padding: 40px 30px;
+	}
+	.profilrInfoSmallBox {
+		margin-left: 40px
+	}
+}
+
+@media screen and (max-width: 600px) {
+	.gameInfoBox {
+		width: 100%;
+		color: white;
+		font-family: Lucida Console;
+		display: flex;
+		flex-direction: column;
+		align-items: flex-start;
+		padding: 40px 10px;
+	}
+	.profilrInfoSmallBox {
+		width: 75%
+	}
+}
+
+#gameSelector {
+	width: 200px;
+}
+
+
+#commentList {
+	width: 95%;
+	display: flex;
+	flex-direction: column;
+	margin: 20px auto 0px auto;
+	padding-bottom: 20px
+}
+
+.postInfoBox {
+	cursor: pointer;
+	margin-top: 20px;
+	width: 100%;
+	height: 50px;
+	background-color: #F2F2F2;
+	box-shadow: 5px 5px 10px -4px black;
+	border-radius: 20px;
+	display: flex;
+	padding: 5px 10px;
+	flex-direction: row;
+	align-items: center;
+	justify-content: space-between
+}

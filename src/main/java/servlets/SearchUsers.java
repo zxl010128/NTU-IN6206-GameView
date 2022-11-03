@@ -39,8 +39,8 @@ public class SearchUsers extends HttpServlet {
 		PrintWriter out = response.getWriter();
 		try {
 				UserDBAO userdbao = new UserDBAO();
-				User user=userdbao.findUserByName(username);
-				if(user==null) {
+				JSONArray users=userdbao.findUserByName(username);
+				if(users.size()==0) {
 					JSONObject json = new JSONObject();
 					json.put("data", "");
 					json.put("message", "fail");
@@ -51,7 +51,7 @@ public class SearchUsers extends HttpServlet {
 					return;
 				}
 				JSONObject json = new JSONObject();
-				json.put("data", JSONObject.fromObject(user));
+				json.put("data", users);
 				json.put("message", "success");
 				json.put("status_code", 200);
 				out.write(json.toString());

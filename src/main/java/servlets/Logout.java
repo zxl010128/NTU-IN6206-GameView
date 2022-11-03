@@ -36,33 +36,34 @@ public class Logout extends HttpServlet {
 		PrintWriter out = response.getWriter();
 		try {
 		UserDBAO userdbao = new UserDBAO();
-		Cookie[] cookie = request.getCookies();
-		Long id = (long)0;
-		if(cookie == null) {
-			JSONObject jsonObject = new JSONObject();
-			jsonObject.put("data", "");
-			jsonObject.put("message", "fail");
-			jsonObject.put("status_code", 401);
-			out.write(jsonObject.toString()); 
-			out.flush(); 
-			out.close();
-			return; 
-		}
-		for(int i=0;i<cookie.length;i++) {
-			if("token".equals(cookie[i].getName())) {
-				id = userdbao.identifyId(cookie[i].getValue());
-				if(id == 0) {
-					JSONObject jsonObject = new JSONObject();
-					jsonObject.put("data", "");
-					jsonObject.put("message", "fail");
-					jsonObject.put("status_code", 401);
-					out.write(jsonObject.toString()); 
-					out.flush(); 
-					out.close();
-					return; 
-				}
-			}
-		}
+//		Cookie[] cookie = request.getCookies();
+//		Long id = (long)0;
+//		if(cookie == null) {
+//			JSONObject jsonObject = new JSONObject();
+//			jsonObject.put("data", "");
+//			jsonObject.put("message", "fail");
+//			jsonObject.put("status_code", 401);
+//			out.write(jsonObject.toString()); 
+//			out.flush(); 
+//			out.close();
+//			return; 
+//		}
+//		for(int i=0;i<cookie.length;i++) {
+//			if("token".equals(cookie[i].getName())) {
+//				id = userdbao.identifyId(cookie[i].getValue());
+//				if(id == 0) {
+//					JSONObject jsonObject = new JSONObject();
+//					jsonObject.put("data", "");
+//					jsonObject.put("message", "fail");
+//					jsonObject.put("status_code", 401);
+//					out.write(jsonObject.toString()); 
+//					out.flush(); 
+//					out.close();
+//					return; 
+//				}
+//			}
+//		}
+		Long id = userdbao.identifyId(request.getParameter("token"));
 		boolean x = userdbao.clearToken(id);
 		if(x == false){
 			JSONObject jsonObject = new JSONObject();
@@ -74,10 +75,10 @@ public class Logout extends HttpServlet {
 			out.close();
 			return;
 		}
-		Cookie cookie1 = new Cookie("token","");
-		cookie1.setMaxAge(0);
-		cookie1.setPath("/");
-		response.addCookie(cookie1);
+//		Cookie cookie1 = new Cookie("token","");
+//		cookie1.setMaxAge(0);
+//		cookie1.setPath("/");
+//		response.addCookie(cookie1);
 		JSONObject jsonObject = new JSONObject();
 		jsonObject.put("data", "");
 		jsonObject.put("message", "success");

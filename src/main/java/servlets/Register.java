@@ -99,7 +99,7 @@ public class Register extends HttpServlet {
 			if(phonenumber.length()!=8) {
 				JSONObject jsonObject = new JSONObject();
 				jsonObject.put("data", "");
-				jsonObject.put("message", "wrong number format");
+				jsonObject.put("message", "phonenumber length should be 8");
 				jsonObject.put("status_code", 400);
 				out.write(jsonObject.toString()); 
 				out.flush(); 
@@ -109,7 +109,7 @@ public class Register extends HttpServlet {
 			if(password.length()<6||password.length()>20) {
 				JSONObject jsonObject = new JSONObject();
 				jsonObject.put("data", "");
-				jsonObject.put("message", "invalid length of password");
+				jsonObject.put("message", "password length should be set between 6 and 20");
 				jsonObject.put("status_code", 400);
 				out.write(jsonObject.toString()); 
 				out.flush(); 

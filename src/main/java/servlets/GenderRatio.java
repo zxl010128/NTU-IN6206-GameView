@@ -53,9 +53,9 @@ public class GenderRatio extends HttpServlet {
 			}
 			else{
 				JSONObject datajson=new JSONObject(); 
-				datajson.put("femaleusers", femaleusers);
-				datajson.put("maleusers", maleusers);
-				datajson.put("unknownusers", unknownusers);
+				datajson.put("Female Users", femaleusers);
+				datajson.put("Male Users", maleusers);
+				datajson.put("Unknown Users", unknownusers);
 				JSONObject json = new JSONObject();
 				json.put("data", datajson);
 				json.put("message", "success");

@@ -9,6 +9,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 
 import entity.Game;
+import entity.User;
 import net.sf.json.JSONArray;
 import net.sf.json.JSONObject;
 
@@ -115,19 +116,20 @@ public class GameDBAO {
         return game;
     }
     
-    public Game findByName(String name) {
-    	Game game = new Game();  
+    public JSONArray findByName(String name) {
+    	JSONArray gamesjson = new JSONArray(); 
 		try {
-			 String selectStatement = "select game_id, gamepicture " + "from game_table where gamename = ?"; 
+			name=name.replace(" ", "%");
+			name="%"+name+"%";
+			 String selectStatement = "select game_id, gamepicture,gamename " + "from game_table where gamename LIKE '"+name+"'"; 
 			 getConnection();  	
 			 PreparedStatement prepStmt = con.prepareStatement(selectStatement);
-		     prepStmt.setString(1, name);
 		     ResultSet rs = prepStmt.executeQuery();
-		     if(rs.next()) {
-		    	 game = new Game(rs.getLong("game_id"),rs.getString("gamepicture"),name);
-		     }
-		     else {
-		    	 game=null;
+		     while(rs.next()) {
+		    	Game game = new Game(rs.getLong("game_id"),rs.getString("gamepicture"),rs.getString("gamename"));
+				JSONObject gamejs = new JSONObject();
+				gamejs.put("game", JSONObject.fromObject(game));
+				gamesjson.add(gamejs);
 		     }
 		     prepStmt.close();
 		     
@@ -136,7 +138,7 @@ public class GameDBAO {
 	         ex.printStackTrace();
 	    }		        
 	    releaseConnection();
-        return game;
+        return gamesjson;
     }
     
     public List<Game> rankByScore(){
@@ -273,4 +275,3 @@ public class GameDBAO {
 	}
     
 }
-    	

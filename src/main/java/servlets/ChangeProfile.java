@@ -6,11 +6,11 @@ import java.io.PrintWriter;
 
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
-import javax.servlet.http.Cookie;
+
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-
+import entity.User;
 import DAO.UserDBAO;
 import net.sf.json.JSONObject;
 
@@ -38,16 +38,42 @@ public class ChangeProfile extends HttpServlet {
 //		String username = request.getParameter("username"); 
 		String email = request.getParameter("email"); 
 		String phonenumber = request.getParameter("phonenumber"); 
-		String facepicture = request.getParameter("facepicture"); 
+//		String facepicture = request.getParameter("facepicture"); 
 //		String password = request.getParameter("password"); 
 		String dob = request.getParameter("dob"); 
 		int gender = Integer.parseInt(request.getParameter("gender")); 
 		try { 
 			PrintWriter out = response.getWriter();
 			UserDBAO userdbao = new UserDBAO();
-			Cookie[] cookie = request.getCookies();
-			Long id = (long)0;
-			if(cookie == null) {
+//			Cookie[] cookie = request.getCookies();
+//			Long id = (long)0;
+//			if(cookie == null) {
+//				JSONObject jsonObject = new JSONObject();
+//				jsonObject.put("data", "");
+//				jsonObject.put("message", "fail");
+//				jsonObject.put("status_code", 401);
+//				out.write(jsonObject.toString()); 
+//				out.flush(); 
+//				out.close();
+//				return; 
+//			}
+//			for(int i=0;i<cookie.length;i++) {
+//				if("token".equals(cookie[i].getName())) {
+//					id = userdbao.identifyId(cookie[i].getValue());
+//					if(id == 0) {
+//						JSONObject jsonObject = new JSONObject();
+//						jsonObject.put("data", "");
+//						jsonObject.put("message", "fail");
+//						jsonObject.put("status_code", 401);
+//						out.write(jsonObject.toString()); 
+//						out.flush(); 
+//						out.close();
+//						return; 
+//					}
+//				}
+//			}
+			Long id = userdbao.identifyId(request.getParameter("token"));
+			if(id == 0) {
 				JSONObject jsonObject = new JSONObject();
 				jsonObject.put("data", "");
 				jsonObject.put("message", "fail");
@@ -56,21 +82,6 @@ public class ChangeProfile extends HttpServlet {
 				out.flush(); 
 				out.close();
 				return; 
-			}
-			for(int i=0;i<cookie.length;i++) {
-				if("token".equals(cookie[i].getName())) {
-					id = userdbao.identifyId(cookie[i].getValue());
-					if(id == 0) {
-						JSONObject jsonObject = new JSONObject();
-						jsonObject.put("data", "");
-						jsonObject.put("message", "fail");
-						jsonObject.put("status_code", 401);
-						out.write(jsonObject.toString()); 
-						out.flush(); 
-						out.close();
-						return; 
-					}
-				}
 			}
 			if(phonenumber.length()!=8) {
 				JSONObject jsonObject = new JSONObject();
@@ -82,7 +93,9 @@ public class ChangeProfile extends HttpServlet {
 				out.close();
 				return;
 			}
-			if(userdbao.ifEmailExists(email)) {
+			User user=userdbao.findByUserid(id);
+			if(email.equals(user.getemail())==false) {
+				if(userdbao.ifEmailExists(email)) {
 				JSONObject jsonObject = new JSONObject();
 				jsonObject.put("data", "");
 				jsonObject.put("message", "email exists");
@@ -92,7 +105,12 @@ public class ChangeProfile extends HttpServlet {
 				out.close();
 				return;
 			}
-			boolean x = userdbao.changeProfile(facepicture, email, phonenumber, gender, dob, id);
+			}
+			if(gender==3) {
+				gender=user.getgender();
+			}
+			
+			boolean x = userdbao.changeProfile(email, phonenumber, gender, dob, id);
 			if (x == false) {
 				JSONObject jsonObject = new JSONObject();
 				jsonObject.put("data", "");

@@ -40,33 +40,55 @@ public class AddLike extends HttpServlet {
 			PrintWriter out = response.getWriter();
 			UserDBAO userdbao = new UserDBAO();
 			CommentDBAO commentdbao = new CommentDBAO();
-			Cookie[] cookie = request.getCookies();
 			Long id = (long)0;
-			if(cookie == null) {
-				JSONObject jsonObject = new JSONObject();
-				jsonObject.put("data", "");
-				jsonObject.put("message", "fail");
-				jsonObject.put("status_code", 401);
-				out.write(jsonObject.toString()); 
-				out.flush(); 
-				out.close();
-				return; 
-			}
-			for(int i=0;i<cookie.length;i++) {
-				if("token".equals(cookie[i].getName())) {
-					id = userdbao.identifyId(cookie[i].getValue());
-					if(id == 0) {
-						JSONObject jsonObject = new JSONObject();
-						jsonObject.put("data", "");
-						jsonObject.put("message", "fail");
-						jsonObject.put("status_code", 401);
-						out.write(jsonObject.toString()); 
-						out.flush(); 
-						out.close();
-						return; 
-					}
-				}
-			}
+//			if(cookie == null) {
+//				JSONObject jsonObject = new JSONObject();
+//				jsonObject.put("data", "");
+//				jsonObject.put("message", "fail");
+//				jsonObject.put("status_code", 401);
+//				out.write(jsonObject.toString()); 
+//				out.flush(); 
+//				out.close();
+//				return; 
+//			}
+//			for(int i=0;i<cookie.length;i++) {
+//				if("token".equals(cookie[i].getName())) {
+//					id = userdbao.identifyId(cookie[i].getValue());
+//					if(id == 0) {
+//						JSONObject jsonObject = new JSONObject();
+//						jsonObject.put("data", "");
+//						jsonObject.put("message", "fail");
+//						jsonObject.put("status_code", 401);
+//						out.write(jsonObject.toString()); 
+//						out.flush(); 
+//						out.close();
+//						return; 
+//					}
+//				}
+//			}
+			id = userdbao.identifyId(request.getParameter("token"));
+			   if(id == 0) {
+			    JSONObject jsonObject = new JSONObject();
+			    jsonObject.put("data", "");
+			    jsonObject.put("message", "fail");
+			    jsonObject.put("status_code", 401);
+			    out.write(jsonObject.toString()); 
+			    out.flush(); 
+			    out.close();
+			    return; 
+			   }
+			   
+			   boolean iflikeexists = userdbao.ifLikeExists(id, post_id);
+			   if(iflikeexists == true) {
+			    JSONObject jsonObject = new JSONObject();
+			    jsonObject.put("data", "");
+			    jsonObject.put("message", "liked");
+			    jsonObject.put("status_code", 500); 
+			    out.write(jsonObject.toString()); 
+			    out.flush(); 
+			    out.close();
+			    return;
+			   }
 			
 			boolean x = userdbao.newLike(id, post_id);
 			if(x == false) {

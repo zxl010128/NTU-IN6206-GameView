@@ -140,13 +140,13 @@ public class User {
 		return like_list;
 	}
 	
-	public String post_list;
+//	public String post_list;
+//	
+//	public String getpostlist() {
+//		return post_list;
+//	}
 	
-	public String getpostlist() {
-		return post_list;
-	}
-	
-	public User(Long id, String userName, String facepic, String phone, String email, String dob, int gender,String createTime,String bookmark_list,String like_list,String post_list) {
+	public User(Long id, String userName, String facepic, String phone, String email, String dob, int gender,String createTime,String bookmark_list,String like_list) {
 		this.id = id;
 		this.userName = userName;
 		this.facepic = facepic;
@@ -157,7 +157,21 @@ public class User {
 		this.createTime = createTime;
 		this.bookmark_list=bookmark_list;
 		this.like_list=like_list;
-		this.post_list=post_list;
+//		this.post_list=post_list;
+	}
+	
+	public User(Long id, String userName, String facepic, String phone, String email, String dob, int gender,String createTime,String bookmark_list,String like_list,int coin) {
+		this.id = id;
+		this.userName = userName;
+		this.facepic = facepic;
+		this.dob = dob;
+		this.gender = gender;
+		this.phone = phone;
+		this.email = email;	
+		this.createTime = createTime;
+		this.bookmark_list=bookmark_list;
+		this.like_list=like_list;
+		this.coin=coin;
 	}
 	
 	public User(Long id, String facepic, String userName) {

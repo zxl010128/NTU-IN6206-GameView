@@ -1,0 +1,74 @@
+@charset "UTF-8";
+
+.statContainer {
+	background-color: #18123d;
+}
+
+.statBox {
+	width: 95%; 
+	margin: 40px auto 0 auto;  
+	background-color: rgba(255,255,255,0.25); 
+	border-radius: 20px;
+	display: flex;
+	flex-direction: column;
+	padding: 20px 40px 40px 40px;
+	align-items: center
+}
+
+.statInfoBox {
+	width: 95%;
+	display: flex;
+	flex-direction: row;
+	flex-wrap: wrap;
+	justify-content: space-around;
+	
+}
+
+.smallInfoBox {
+	margin-top: 40px;
+	background-color: white;
+	width: 300px;
+	height: 200px;
+	display: flex;
+	flex-direction: column;
+	box-shadow: 5px 5px 10px -4px black;
+	border-radius: 20px;
+	align-items: center;
+	justify-content: center;
+}
+
+.smallInfoBoxTitle {
+	font-family: Lucida Console;
+}
+
+.smallInfoBoxText {
+	font-size: 50px;
+	font-weight: 900;
+}
+
+#genderRatio {
+	margin-top: 40px;
+	box-shadow: 5px 5px 10px -4px black;
+	border-radius: 20px;
+	background-color: white;
+	width: 800px; 
+	height: 800px;
+}
+
+#CommentRatio {
+	margin-top: 40px;
+	box-shadow: 5px 5px 10px -4px black;
+	border-radius: 20px;
+	background-color: white;
+	width: 800px; 
+	height: 800px;
+}
+
+#averageChart {
+	margin-top: 80px;
+	box-shadow: 5px 5px 10px -4px black;
+	border-radius: 20px;
+	background-color: white;
+	width: 800px; 
+	height: 800px;
+}

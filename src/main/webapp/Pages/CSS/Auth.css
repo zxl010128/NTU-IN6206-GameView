@@ -1,0 +1,112 @@
+@charset "ISO-8859-1";
+
+.authBack {
+	width: 40px;
+	margin: 20px;
+	cursor: pointer
+}
+
+@media screen and (max-width: 1000px) {
+	body {
+		overflow: scroll;
+	}
+    .loginADBox {
+		height: 50%;
+		width: 100%;
+	}
+	
+	.loginBox {
+		margin: 0px 0 50px 0;
+		left: 0;
+		height: 100%;
+		width: 100%; 
+		display: flex;
+		flex-direction: column;
+		justify-content: center;
+	}
+	
+	.loginAD {
+		height: 70%;
+		width: 100%;
+	}
+	.loginInfoBox {
+		width: 300px;
+		margin: 0 auto;
+	}
+	
+	#firstButtonAuth {
+		width: 250px; 
+		margin: 30px auto
+	}
+	
+	#secondButtonAuth {
+		width: 250px; 
+		margin: -15px auto 0 auto
+	}
+}
+
+@media screen and (min-width: 1000px) {
+    .loginADBox {
+		height: 100%; 
+		position: fixed;
+	}
+	
+	.loginBox {
+		left: 75%;
+		position: fixed;
+		height: 100%;
+		width: 25%; 
+		display: flex;
+		flex-direction: column;
+		justify-content: center;
+	}
+	.loginAD {
+		height: 100%;
+		width: 75%;
+		position: fixed;
+	}
+	
+	.loginInfoBox {
+		width: 100%;
+	}
+	
+	#firstButtonAuth {
+		width: 50%; 
+		margin: 30px auto
+	}
+	
+	#secondButtonAuth {
+		width: 50%; 
+		margin: -15px auto 0 auto
+	}
+}
+
+
+.loginTitle {
+	text-align: center;
+	font-size: 30px;
+	font-family: Arial;
+	font-weight: 700;
+	padding-bottom: 30px
+}
+
+.loginForget {
+	color: blue;
+	text-decoration: underline;
+	cursor: pointer;
+	font-size: 15px;
+	margin-bottom: 20px
+}
+
+.registerForget {
+	margin: -15px auto;
+	color: blue;
+	text-decoration: underline;
+	cursor: pointer;
+	font-size: 15px;
+}
+
+.g-recaptcha {
+  transform: scale(0.8);
+  transform-origin: 0 0;
+}
