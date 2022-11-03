@@ -106,7 +106,7 @@ public class Comment {
 		totalLike++;
 	}
 	
-	public int getTotoalDislike() {
+	public int getTotalDislike() {
 		return totalDislike;
 	}
 	
